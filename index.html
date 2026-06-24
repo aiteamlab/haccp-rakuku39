@@ -7,6 +7,20 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+.login-bg{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#F5F5F3}
+.login-card{background:#fff;border:1px solid #E0E0D8;border-radius:16px;padding:36px 32px;width:360px;max-width:90vw}
+.login-logo{font-size:11px;color:#888;letter-spacing:.07em;margin-bottom:6px}
+.login-title{font-size:22px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.login-sub{font-size:12px;color:#888;margin-bottom:24px}
+.login-label{font-size:12px;color:#555;margin-bottom:4px;display:block}
+.login-input{width:100%;border:1px solid #D0D0C8;border-radius:7px;padding:10px 12px;font-size:14px;color:#222;margin-bottom:14px}
+.login-input:focus{outline:none;border-color:#1D9E75}
+.login-btn{width:100%;padding:12px;background:#1D9E75;color:#fff;border:none;border-radius:7px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.login-btn:hover{opacity:.9}
+.login-btn:disabled{background:#CCC;cursor:not-allowed}
+.login-error{font-size:13px;color:#A32D2D;background:#FCEBEB;border:1px solid #F09595;border-radius:6px;padding:8px 12px;margin-top:12px;display:none}
+.login-loading{font-size:13px;color:#888;text-align:center;margin-top:12px;display:none}
+
 body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;background:#F5F5F3;color:#222;min-height:100vh}
 .wrap{max-width:920px;margin:0 auto;padding:24px 20px 60px}
 .header{background:#fff;border:1px solid #E0E0D8;border-radius:12px;padding:16px 20px;margin-bottom:14px}
@@ -96,12 +110,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 </style>
 </head>
 <body>
-<div class="wrap">
+<div id="app" style="display:none"><div class="wrap">
 
   <div class="header">
     <div class="header-top">
       <div>
-        <div class="brand">らくっく39 × HACCP管理システム ／ ケアホーム春らんまん</div>
+        <div class="brand">らくっく39 × HACCP管理システム ／ <span id="facility-name-header">ケアホーム春らんまん</span></div>
         <div class="page-title">衛生チェック記録表</div>
       </div>
       <div class="date-chip" id="date-chip"></div>
@@ -261,10 +275,11 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   </div>
 </div>
 
-<!-- GAS送信用の隠しiframe -->
+</div></div><!-- GAS送信用の隠しiframe -->
 <iframe name="hidden-iframe" style="display:none"></iframe>
 <!-- GAS送信用の隠しフォーム -->
 <form id="gas-form" method="POST" action="https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec" target="hidden-iframe" style="display:none">
+  <input type="hidden" name="facilityName" id="f-facility">
   <input type="hidden" name="date" id="f-date">
   <input type="hidden" name="time" id="f-time">
   <input type="hidden" name="staff" id="f-staff">
@@ -284,6 +299,67 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 </form>
 
 <script>
+
+
+const GAS_URL='https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec';
+
+function doLogin(){
+  const id=document.getElementById('login-id').value.trim();
+  const pass=document.getElementById('login-pass').value.trim();
+  if(!id||!pass){
+    showLoginError('IDとパスワードを入力してください');
+    return;
+  }
+  document.getElementById('login-btn').disabled=true;
+  document.getElementById('login-error').style.display='none';
+  document.getElementById('login-loading').style.display='block';
+
+  // GASにGETリクエストで認証
+  fetch(GAS_URL+'?action=check&id='+encodeURIComponent(id)+'&password='+encodeURIComponent(pass)+'&t='+Date.now())
+    .then(r=>r.json())
+    .then(data=>{
+      document.getElementById('login-loading').style.display='none';
+      if(data.result==='success'){
+        // セッション保存
+        sessionStorage.setItem('haccp_login','1');
+        sessionStorage.setItem('haccp_facility',data.facilityName);
+        sessionStorage.setItem('haccp_id',id);
+        sessionStorage.setItem('haccp_pass',pass);
+        showApp(data.facilityName);
+      } else if(data.result==='disabled'){
+        showLoginError('このアカウントは現在利用停止中です。\nらくっく39担当者にお問い合わせください。');
+        document.getElementById('login-btn').disabled=false;
+      } else {
+        showLoginError('IDまたはパスワードが正しくありません。');
+        document.getElementById('login-btn').disabled=false;
+      }
+    })
+    .catch(err=>{
+      document.getElementById('login-loading').style.display='none';
+      showLoginError('通信エラーが発生しました。再度お試しください。');
+      document.getElementById('login-btn').disabled=false;
+    });
+}
+
+function showLoginError(msg){
+  const el=document.getElementById('login-error');
+  el.textContent=msg;
+  el.style.display='block';
+}
+
+function showApp(facilityName){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('facility-name-header').textContent=facilityName;
+}
+
+function checkSession(){
+  const login=sessionStorage.getItem('haccp_login');
+  const facility=sessionStorage.getItem('haccp_facility');
+  if(login==='1'&&facility){
+    showApp(facility);
+  }
+}
 
 const DEFAULT_STAFF=['山田 花子','佐藤 美咲','中村 由紀'];
 
@@ -384,6 +460,7 @@ const TOTAL=7;
 
 const d=new Date();
 const days=['日','月','火','水','木','金','土'];
+checkSession();
 renderStaffSelect();
 document.getElementById('date-chip').textContent=
   d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+days[d.getDay()]+'）';
@@ -450,6 +527,7 @@ function saveRecord(){
   document.getElementById('f-date').value=dateStr;
   document.getElementById('f-time').value=timeStr;
   document.getElementById('f-staff').value=document.getElementById('staff').value||'未選択';
+  document.getElementById('f-facility').value=sessionStorage.getItem('haccp_facility')||'—';
   document.getElementById('f-meals').value=document.getElementById('meal-count').value||'—';
   document.getElementById('f-r1').value=f(state.r1);
   document.getElementById('f-r2').value=f(state.r2);
