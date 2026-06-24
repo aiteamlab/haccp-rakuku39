@@ -75,6 +75,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .staff-name{flex:1;font-size:13px;color:#222}
 .btn-del{background:none;border:none;color:#CCC;cursor:pointer;font-size:16px;padding:2px 6px}
 .btn-del:hover{color:#E24B4A}
+.btn-edit{background:none;border:none;color:#CCC;cursor:pointer;font-size:16px;padding:2px 6px}
+.btn-edit:hover{color:#1D9E75}
+.staff-edit-row{display:flex;gap:6px;flex:1}
+.staff-edit-input{flex:1;border:1px solid #1D9E75;border-radius:6px;padding:4px 8px;font-size:13px;color:#222}
+.btn-edit-save{background:#1D9E75;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
+.btn-edit-cancel{background:#fff;color:#888;border:1px solid #CCC;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
 .staff-add-row{display:flex;gap:8px}
 .staff-add-input{flex:1;border:1px solid #D0D0C8;border-radius:6px;padding:7px 10px;font-size:13px;color:#222}
 .btn-add{padding:7px 14px;background:#1D9E75;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;white-space:nowrap}
@@ -311,11 +317,36 @@ function renderStaffList(){
     return;
   }
   ul.innerHTML=list.map((name,i)=>`
-    <li class="staff-item">
-      <span class="staff-name">${name}</span>
+    <li class="staff-item" id="staff-item-${i}">
+      <span class="staff-name" id="staff-name-${i}">${name}</span>
+      <button class="btn-edit" onclick="startEdit(${i})" title="編集"><i class="ti ti-pencil"></i></button>
       <button class="btn-del" onclick="deleteStaff(${i})" title="削除"><i class="ti ti-trash"></i></button>
     </li>
   `).join('');
+}
+
+function startEdit(i){
+  const list=loadStaff();
+  const item=document.getElementById('staff-item-'+i);
+  item.innerHTML=`
+    <div class="staff-edit-row">
+      <input class="staff-edit-input" type="text" id="edit-input-${i}" value="${list[i]}" onkeydown="if(event.key==='Enter')saveEdit(${i})">
+      <button class="btn-edit-save" onclick="saveEdit(${i})">保存</button>
+      <button class="btn-edit-cancel" onclick="renderStaffList()">取消</button>
+    </div>
+  `;
+  document.getElementById('edit-input-'+i).focus();
+  document.getElementById('edit-input-'+i).select();
+}
+
+function saveEdit(i){
+  const input=document.getElementById('edit-input-'+i);
+  const newName=input.value.trim();
+  if(!newName){alert('名前を入力してください');return;}
+  const list=loadStaff();
+  list[i]=newName;
+  saveStaff(list);
+  renderStaffList();
 }
 
 function openStaffMgr(){
