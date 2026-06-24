@@ -85,6 +85,23 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .staff-add-input{flex:1;border:1px solid #D0D0C8;border-radius:6px;padding:7px 10px;font-size:13px;color:#222}
 .btn-add{padding:7px 14px;background:#1D9E75;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;white-space:nowrap}
 .btn-add:hover{opacity:.9}
+
+@media print {
+  body{background:#fff}
+  #login-screen{display:none!important}
+  .btn-row,.meta-row .btn-staff-mgr,.btn-csv,.btn-save,#print-btn-wrap{display:none!important}
+  .wrap{padding:10mm 10mm 10mm 10mm;max-width:100%}
+  .header{border-radius:0;border:1px solid #CCC;margin-bottom:8px}
+  .summary{margin-bottom:8px}
+  .stat{border:1px solid #CCC;border-radius:4px}
+  .card{border:1px solid #CCC;border-radius:4px;break-inside:avoid}
+  .grid{gap:6px;margin-bottom:8px}
+  .print-footer{display:block!important}
+  .no-print{display:none!important}
+}
+.print-footer{display:none;margin-top:16px;border-top:1px solid #E0E0D8;padding-top:10px;font-size:11px;color:#888;text-align:right}
+.btn-print{padding:10px 20px;background:#3B5BDB;color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-print:hover{opacity:.9}
 @media(max-width:640px){
   .grid{grid-template-columns:1fr}
   .summary{grid-template-columns:repeat(2,1fr)}
@@ -120,7 +137,10 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <div class="brand">らくっく39 × HACCP管理システム ／ <span id="facility-name-header">—</span></div>
         <div class="page-title">衛生チェック記録表</div>
       </div>
-      <div class="date-chip" id="date-chip"></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <input type="date" id="date-chip" style="font-size:13px;color:#555;background:#F1EFE8;padding:6px 14px;border-radius:6px;border:1px solid #E0E0D8;cursor:pointer" onchange="onDateChange(this.value)">
+      <span style="font-size:11px;color:#888" id="date-mode-label">今日の記録</span>
+    </div>
     </div>
     <div style="margin-top:10px;display:flex;justify-content:flex-end">
       <a href="dashboard.html" style="padding:6px 14px;background:#fff;color:#555;border:1px solid #CCC;border-radius:6px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;text-decoration:none"><i class="ti ti-chart-bar"></i> ダッシュボードへ</a>
@@ -261,6 +281,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     <div class="error-msg" id="error-msg"><i class="ti ti-alert-circle"></i> 送信に失敗しました。CSV出力で手動保存してください。</div>
     <button class="btn-csv" onclick="exportCSV()"><i class="ti ti-download"></i> CSV出力</button>
     <button class="btn-save" id="save-btn" onclick="saveRecord()" disabled><i class="ti ti-device-floppy"></i> 記録を保存する</button>
+  </div>
+  <div id="print-btn-wrap" style="display:none;justify-content:flex-end;margin-top:10px">
+    <button class="btn-print" onclick="printRecord()"><i class="ti ti-printer"></i> この記録を印刷する</button>
+  </div>
+  <div class="print-footer" id="print-footer">
+    らくっく39 × HACCP管理システム ／ <span id="print-facility"></span> ／ 記録日：<span id="print-date"></span> ／ 担当者：<span id="print-staff-name"></span>
   </div>
 
 </div>
@@ -475,8 +501,8 @@ const d=new Date();
 const days=['日','月','火','水','木','金','土'];
 checkSession();
 renderStaffSelect();
-document.getElementById('date-chip').textContent=
-  d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+days[d.getDay()]+'）';
+const todayStr=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+document.getElementById('date-chip').value=todayStr;
 
 function tap(rid,cid){
   state[rid]=state[rid]===true?null:true;
@@ -566,6 +592,128 @@ function saveRecord(){
   },1500);
 }
 
+
+
+let currentDateMode='today'; // today or past
+
+function onDateChange(val){
+  const today=new Date();
+  const todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  if(val===todayStr){
+    currentDateMode='today';
+    document.getElementById('date-mode-label').textContent='今日の記録';
+    document.getElementById('date-mode-label').style.color='#888';
+    // 画面をリセット
+    resetForm();
+  } else {
+    currentDateMode='past';
+    document.getElementById('date-mode-label').textContent='過去記録（閲覧のみ）';
+    document.getElementById('date-mode-label').style.color='#BA7517';
+    // 過去記録を読み込む
+    loadPastRecord(val);
+  }
+}
+
+function resetForm(){
+  // チェック状態をリセット
+  Object.keys(state).forEach(k=>{state[k]=null;});
+  ['c1','c2','c3','c4','c5','c6','c7'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.classList.remove('ok','ng');}
+  });
+  ['r1','r2','r3','r4','r5','r6','r7'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.classList.remove('is-ok','is-ng');el.style.background='';}
+  });
+  ['n1','n2','n3','n4','n5','n6'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.style.display='none';el.value='';}
+  });
+  ['t1','t2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  ['tb1','tb2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.textContent='';el.className='t-badge';}
+  });
+  document.getElementById('staff').value='';
+  document.getElementById('meal-count').value='';
+  document.getElementById('save-btn').disabled=true;
+  document.getElementById('save-btn').innerHTML='<i class="ti ti-device-floppy"></i> 記録を保存する';
+  document.getElementById('saved-msg').style.display='none';
+  document.getElementById('print-btn-wrap').style.display='none';
+  // 入力を有効化
+  setFormReadonly(false);
+  updateSummary();
+}
+
+function setFormReadonly(readonly){
+  const inputs=document.querySelectorAll('#app input, #app select, #app textarea');
+  inputs.forEach(el=>{
+    if(el.id!=='date-chip') el.disabled=readonly;
+  });
+  const rows=document.querySelectorAll('.row');
+  rows.forEach(row=>{
+    row.style.pointerEvents=readonly?'none':'auto';
+    row.style.opacity=readonly?'0.7':'1';
+  });
+  document.getElementById('save-btn').style.display=readonly?'none':'flex';
+  document.getElementById('btn-csv-wrap') && (document.getElementById('btn-csv-wrap').style.display=readonly?'none':'flex');
+}
+
+function loadPastRecord(dateStr){
+  // スプレッドシートから該当日の記録を取得
+  const label=document.getElementById('date-mode-label');
+  label.textContent='読み込み中...';
+  
+  fetch(GAS_URL+'?action=getbydate&date='+encodeURIComponent(dateStr)+'&t='+Date.now())
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.record){
+        const r=data.record;
+        label.textContent='過去記録（閲覧のみ）';
+        // フォームに値をセット
+        document.getElementById('staff').value=r['担当者']||'';
+        document.getElementById('meal-count').value=r['食数']||'';
+        // チェック状態を反映
+        const map=[
+          ['r1','c1','①数量確認'],['r2','c2','①外観確認'],
+          ['r3','c3','①受取温度'],['r4','c4','②体調確認'],
+          ['r5','c5','②手洗い'],['r6','c6','③配膳前温度'],
+          ['r7','c7','④清掃消毒']
+        ];
+        map.forEach(([rid,cid,key])=>{
+          const val=r[key];
+          if(val==='OK'){state[rid]=true;}
+          else if(val==='NG'){state[rid]=false;}
+          else{state[rid]=null;}
+          render(rid,cid);
+        });
+        // 温度値
+        if(r['①受取温度値(℃)']&&r['①受取温度値(℃)']!=='—') document.getElementById('t1').value=r['①受取温度値(℃)'];
+        if(r['③配膳前温度値(℃)']&&r['③配膳前温度値(℃)']!=='—') document.getElementById('t2').value=r['③配膳前温度値(℃)'];
+        // 備考
+        if(r['NG備考（到着時）']) document.getElementById('n1').value=r['NG備考（到着時）'];
+        if(r['NG備考（配膳前）']) document.getElementById('n6').value=r['NG備考（配膳前）'];
+        setFormReadonly(true);
+        updateSummary();
+      } else {
+        label.textContent='この日の記録はありません';
+        resetForm();
+        setFormReadonly(true);
+        document.getElementById('save-btn').style.display='none';
+      }
+    })
+    .catch(()=>{
+      label.textContent='読み込みエラー';
+    });
+}
+
+function printRecord(){
+  document.getElementById('print-footer').style.display='block';
+  window.print();
+}
 function exportCSV(){
   const now=new Date();
   const dateStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
