@@ -78,6 +78,14 @@ tr:hover td{background:#F8F8F5}
     <button class="period-btn" onclick="setPeriod(30,this)">直近30日</button>
     <button class="period-btn" onclick="setPeriod(90,this)">直近90日</button>
     <button class="period-btn" onclick="setPeriod(9999,this)">全期間</button>
+    <button class="period-btn" onclick="setPeriod(-1,this)">日付指定</button>
+  </div>
+  <div id="date-range-row" style="display:none;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <span style="font-size:12px;color:#888">期間：</span>
+    <input type="date" id="date-from" style="border:1px solid #CCC;border-radius:6px;padding:5px 10px;font-size:13px;color:#222">
+    <span style="font-size:12px;color:#888">〜</span>
+    <input type="date" id="date-to" style="border:1px solid #CCC;border-radius:6px;padding:5px 10px;font-size:13px;color:#222">
+    <button onclick="applyDateRange()" style="padding:5px 14px;background:#1D9E75;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">適用</button>
   </div>
 
   <div id="loading" class="loading"><i class="ti ti-loader"></i> データを読み込み中...</div>
@@ -189,7 +197,37 @@ function setPeriod(days,btn){
   periodDays=days;
   document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderAll();
+  const dateRow=document.getElementById('date-range-row');
+  if(days===-1){
+    dateRow.style.display='flex';
+    // デフォルトで今日と30日前をセット
+    const today=new Date();
+    const from=new Date();from.setDate(from.getDate()-30);
+    document.getElementById('date-to').value=today.toISOString().slice(0,10);
+    document.getElementById('date-from').value=from.toISOString().slice(0,10);
+  } else {
+    dateRow.style.display='none';
+    renderAll();
+  }
+}
+
+function applyDateRange(){
+  const from=document.getElementById('date-from').value;
+  const to=document.getElementById('date-to').value;
+  if(!from||!to){alert('開始日と終了日を入力してください');return;}
+  periodDays=-1;
+  renderAllWithRange(from,to);
+}
+
+function renderAllWithRange(from,to){
+  const fromDate=new Date(from);
+  const toDate=new Date(to);
+  toDate.setHours(23,59,59);
+  const data=allData.filter(r=>{
+    const d=new Date(String(r['記録日']).slice(0,10));
+    return d>=fromDate && d<=toDate;
+  });
+  renderWithData(data);
 }
 
 async function loadData(){
@@ -225,6 +263,10 @@ function badge(v){
 
 function renderAll(){
   const data=filterByPeriod(allData);
+  renderWithData(data);
+}
+
+function renderWithData(data){
   const sorted=[...data].sort((a,b)=>String(b['記録日']).localeCompare(String(a['記録日'])));
 
   // サマリー
