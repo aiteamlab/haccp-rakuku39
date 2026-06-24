@@ -9,7 +9,6 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;background:#F5F5F3;color:#222;min-height:100vh}
 .wrap{max-width:920px;margin:0 auto;padding:24px 20px 60px}
-
 .header{background:#fff;border:1px solid #E0E0D8;border-radius:12px;padding:16px 20px;margin-bottom:14px}
 .header-top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px}
 .brand{font-size:11px;color:#888;letter-spacing:.07em;margin-bottom:3px}
@@ -18,8 +17,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .meta-row{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
 .meta-label{font-size:12px;color:#888;white-space:nowrap}
 .meta-select{border:1px solid #D0D0C8;border-radius:6px;padding:6px 10px;font-size:13px;color:#222;background:#fff;min-width:160px}
-.meta-input{border:1px solid #D0D0C8;border-radius:6px;padding:6px 10px;font-size:13px;color:#222;background:#fff;min-width:160px}
-
+.meta-input{border:1px solid #D0D0C8;border-radius:6px;padding:6px 10px;font-size:13px;color:#222;background:#fff;width:90px}
 .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
 .stat{background:#fff;border:1px solid #E0E0D8;border-radius:10px;padding:12px 14px}
 .stat-label{font-size:11px;color:#888;margin-bottom:5px}
@@ -27,12 +25,10 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .stat-val.green{color:#1D9E75}
 .stat-val.red{color:#E24B4A}
 .stat-val.small{font-size:13px;padding-top:5px;font-weight:500}
-
 .prog-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
 .prog-track{flex:1;height:5px;background:#E8E8E0;border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;background:#1D9E75;border-radius:3px;transition:width .3s ease}
 .prog-label{font-size:12px;color:#888;white-space:nowrap;min-width:36px;text-align:right}
-
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
 .card{background:#fff;border:1px solid #E0E0D8;border-radius:12px;overflow:hidden}
 .card-head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#F8F8F5;border-bottom:1px solid #E8E8E0}
@@ -40,7 +36,6 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .card-title{font-size:13px;font-weight:600;color:#1a1a1a;flex:1}
 .card-tag{font-size:11px;background:#E1F5EE;color:#0F6E56;padding:2px 9px;border-radius:4px;font-weight:500}
 .card-body{padding:10px 14px}
-
 .row{display:flex;align-items:flex-start;gap:10px;padding:9px 6px;border-bottom:1px solid #F0F0E8;cursor:pointer;border-radius:6px;transition:background .1s}
 .row:last-child{border-bottom:none}
 .row:hover{background:#F8F8F5}
@@ -51,26 +46,23 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .chk.ng{background:#E24B4A;border-color:#E24B4A;color:#fff}
 .row-label{font-size:13px;color:#1a1a1a;line-height:1.5;font-weight:500}
 .row-sub{font-size:11px;color:#888;margin-top:2px;line-height:1.5}
-
 .temp-row{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
 .t-input{width:72px;border:1px solid #CCC;border-radius:6px;padding:4px 6px;font-size:15px;font-weight:600;color:#222;background:#fff;text-align:center}
 .t-unit{font-size:12px;color:#888}
 .t-badge{font-size:11px;padding:3px 9px;border-radius:4px;font-weight:500}
 .t-ok{background:#E1F5EE;color:#0F6E56}
 .t-ng{background:#FCEBEB;color:#A32D2D}
-
 .ng-area{width:100%;margin-top:7px;border:1px solid #D0D0C8;border-radius:6px;padding:6px 8px;font-size:12px;color:#222;background:#FFF8F8;font-family:inherit;resize:vertical;line-height:1.5}
-
+.notice{font-size:11px;color:#633806;background:#FAEEDA;border:1px solid #EF9F27;border-radius:6px;padding:6px 10px;margin-top:8px;line-height:1.6}
 .btn-row{display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin-top:4px}
 .saved-msg{display:none;font-size:13px;color:#0F6E56;background:#E1F5EE;padding:8px 16px;border-radius:6px;border:1px solid #9FE1CB;align-items:center;gap:6px}
+.error-msg{display:none;font-size:13px;color:#A32D2D;background:#FCEBEB;padding:8px 16px;border-radius:6px;border:1px solid #F09595;align-items:center;gap:6px}
 .btn-csv{padding:9px 16px;background:#fff;color:#555;border:1px solid #CCC;border-radius:7px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px}
 .btn-csv:hover{background:#F5F5F3}
 .btn-save{padding:10px 28px;background:#1D9E75;color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
 .btn-save:hover:not(:disabled){opacity:.9}
 .btn-save:disabled{background:#CCC;cursor:not-allowed}
-
-.notice{font-size:11px;color:#888;background:#F8F8F5;border:1px solid #E8E8E0;border-radius:6px;padding:6px 10px;margin-top:8px;line-height:1.6}
-
+.sending{display:none;font-size:13px;color:#888;align-items:center;gap:6px}
 @media(max-width:640px){
   .grid{grid-template-columns:1fr}
   .summary{grid-template-columns:repeat(2,1fr)}
@@ -94,7 +86,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     </div>
     <div class="meta-row">
       <span class="meta-label">担当者</span>
-      <select class="meta-select" id="staff" onchange="updateSummary()">
+      <select class="meta-select" id="staff">
         <option value="">選択してください</option>
         <option>山田 花子</option>
         <option>佐藤 美咲</option>
@@ -102,7 +94,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <option>（その他）</option>
       </select>
       <span class="meta-label" style="margin-left:8px">食数</span>
-      <input class="meta-input" type="number" id="meal-count" placeholder="例：20" style="width:90px" oninput="updateSummary()">
+      <input class="meta-input" type="number" id="meal-count" placeholder="例：20">
       <span class="meta-label">食</span>
     </div>
   </div>
@@ -121,7 +113,6 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 
   <div class="grid">
 
-    <!-- ① 受取確認 -->
     <div class="card">
       <div class="card-head">
         <i class="ti ti-clipboard-check card-icon"></i>
@@ -147,7 +138,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         </div>
         <div class="row" id="r3">
           <div class="chk" id="c3"><i class="ti ti-check"></i></div>
-          <div style="flex:1" onclick="noop()">
+          <div style="flex:1">
             <div class="row-label">受取時の温度確認</div>
             <div class="row-sub">冷蔵：〇℃以下 ／ 温製：〇℃以上（施設基準）</div>
             <div class="temp-row">
@@ -161,7 +152,6 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
       </div>
     </div>
 
-    <!-- ② 健康チェック -->
     <div class="card">
       <div class="card-head">
         <i class="ti ti-heart-rate-monitor card-icon"></i>
@@ -187,7 +177,6 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
       </div>
     </div>
 
-    <!-- ③ 配膳前確認 -->
     <div class="card">
       <div class="card-head">
         <i class="ti ti-bowl-chopsticks card-icon"></i>
@@ -197,7 +186,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
       <div class="card-body">
         <div class="row" id="r6">
           <div class="chk" id="c6"><i class="ti ti-check"></i></div>
-          <div style="flex:1" onclick="noop()">
+          <div style="flex:1">
             <div class="row-label">配膳直前の温度確認</div>
             <div class="row-sub">温製：〇℃以上 ／ 冷蔵：〇℃以下（施設基準）</div>
             <div class="temp-row">
@@ -205,14 +194,13 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
               <span class="t-unit">℃</span>
               <span class="t-badge" id="tb2"></span>
             </div>
-            <textarea class="ng-area" id="n6" rows="2" placeholder="基準外の場合：再加熱 または 廃棄の対応を記入" style="display:none" onclick="event.stopPropagation()"></textarea>
+            <textarea class="ng-area" id="n6" rows="2" placeholder="基準外の場合：再加熱または廃棄の対応を記入" style="display:none" onclick="event.stopPropagation()"></textarea>
           </div>
         </div>
         <div class="notice">⚠ アレルギー対応食がある場合は、対象利用者への誤提供がないか必ず確認してください。</div>
       </div>
     </div>
 
-    <!-- ④ 清掃・消毒 -->
     <div class="card">
       <div class="card-head">
         <i class="ti ti-spray card-icon"></i>
@@ -233,7 +221,9 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   </div>
 
   <div class="btn-row">
-    <div class="saved-msg" id="saved-msg"><i class="ti ti-circle-check"></i> <span id="saved-time"></span> に保存しました</div>
+    <div class="sending" id="sending"><i class="ti ti-loader"></i> 送信中...</div>
+    <div class="saved-msg" id="saved-msg"><i class="ti ti-circle-check"></i> <span id="saved-time"></span> に保存しました（スプレッドシートに記録済み）</div>
+    <div class="error-msg" id="error-msg"><i class="ti ti-alert-circle"></i> 送信に失敗しました。CSV出力で手動保存してください。</div>
     <button class="btn-csv" onclick="exportCSV()"><i class="ti ti-download"></i> CSV出力</button>
     <button class="btn-save" id="save-btn" onclick="saveRecord()" disabled><i class="ti ti-device-floppy"></i> 記録を保存する</button>
   </div>
@@ -241,6 +231,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 </div>
 
 <script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec';
 const state={r1:null,r2:null,r3:null,r4:null,r5:null,r6:null,r7:null};
 const TOTAL=7;
 
@@ -248,8 +239,6 @@ const d=new Date();
 const days=['日','月','火','水','木','金','土'];
 document.getElementById('date-chip').textContent=
   d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+days[d.getDay()]+'）';
-
-function noop(){}
 
 function tap(rid,cid){
   state[rid]=state[rid]===true?null:true;
@@ -303,37 +292,68 @@ function updateSummary(){
   document.getElementById('save-btn').disabled=(done<TOTAL);
 }
 
-function saveRecord(){
+function getFormData(){
   const now=new Date();
-  const t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('saved-time').textContent=t;
-  const msg=document.getElementById('saved-msg');
-  msg.style.display='flex';
+  const f=v=>v===true?'OK':v===false?'NG':'—';
+  return {
+    date: now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0'),
+    time: String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'),
+    staff: document.getElementById('staff').value||'未選択',
+    meals: document.getElementById('meal-count').value||'—',
+    r1:f(state.r1), r2:f(state.r2), r3:f(state.r3),
+    t1: document.getElementById('t1').value||'—',
+    r4:f(state.r4), r5:f(state.r5),
+    r6:f(state.r6),
+    t2: document.getElementById('t2').value||'—',
+    r7:f(state.r7),
+    n1: document.getElementById('n1').value||'',
+    n4: document.getElementById('n4').value||'',
+    n6: document.getElementById('n6').value||'',
+    n7: ''
+  };
+}
+
+async function saveRecord(){
   const btn=document.getElementById('save-btn');
-  btn.innerHTML='<i class="ti ti-check"></i> 保存済み';
+  const sending=document.getElementById('sending');
+  const savedMsg=document.getElementById('saved-msg');
+  const errorMsg=document.getElementById('error-msg');
+
   btn.disabled=true;
+  sending.style.display='flex';
+  errorMsg.style.display='none';
+
+  const data=getFormData();
+
+  try{
+    await fetch(GAS_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+    sending.style.display='none';
+    document.getElementById('saved-time').textContent=data.time;
+    savedMsg.style.display='flex';
+    btn.innerHTML='<i class="ti ti-check"></i> 保存済み';
+  }catch(err){
+    sending.style.display='none';
+    errorMsg.style.display='flex';
+    btn.disabled=false;
+  }
 }
 
 function exportCSV(){
-  const d=new Date();
-  const dateStr=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  const staff=document.getElementById('staff').value||'未選択';
-  const meals=document.getElementById('meal-count').value||'—';
-  const f=v=>v===true?'OK':v===false?'NG':'—';
+  const data=getFormData();
   const rows=[
     ['日付','担当者','食数','①数量確認','①外観確認','①受取温度','①受取温度値(℃)','②体調確認','②手洗い','③配膳前温度','③配膳前温度値(℃)','④清掃消毒'],
-    [dateStr,staff,meals,f(state.r1),f(state.r2),f(state.r3),
-      document.getElementById('t1').value||'—',
-      f(state.r4),f(state.r5),f(state.r6),
-      document.getElementById('t2').value||'—',
-      f(state.r7)
-    ]
+    [data.date,data.staff,data.meals,data.r1,data.r2,data.r3,data.t1,data.r4,data.r5,data.r6,data.t2,data.r7]
   ];
   const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='HACCP_'+dateStr+'.csv';
+  a.href=url;a.download='HACCP_'+data.date+'.csv';
   document.body.appendChild(a);a.click();
   document.body.removeChild(a);URL.revokeObjectURL(url);
 }
