@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>らくっく39 × HACCP ダッシュボード</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;background:#F5F5F3;color:#222;min-height:100vh}
+.wrap{max-width:960px;margin:0 auto;padding:24px 20px 60px}
+.header{background:#fff;border:1px solid #E0E0D8;border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.brand{font-size:11px;color:#888;letter-spacing:.07em;margin-bottom:3px}
+.page-title{font-size:20px;font-weight:600;color:#1a1a1a}
+.btn-reload{padding:8px 16px;background:#1D9E75;color:#fff;border:none;border-radius:7px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-reload:hover{opacity:.9}
+.btn-check{padding:8px 16px;background:#fff;color:#555;border:1px solid #CCC;border-radius:7px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;text-decoration:none}
+.header-btns{display:flex;gap:8px;flex-wrap:wrap}
+.loading{text-align:center;padding:40px;color:#888;font-size:14px}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:#fff;border:1px solid #E0E0D8;border-radius:10px;padding:14px 16px}
+.stat-label{font-size:11px;color:#888;margin-bottom:6px}
+.stat-val{font-size:26px;font-weight:600;color:#1a1a1a}
+.stat-val.green{color:#1D9E75}
+.stat-val.red{color:#E24B4A}
+.stat-val.amber{color:#BA7517}
+.stat-sub{font-size:11px;color:#888;margin-top:3px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+.card{background:#fff;border:1px solid #E0E0D8;border-radius:12px;overflow:hidden}
+.card-head{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#F8F8F5;border-bottom:1px solid #E8E8E0}
+.card-icon{font-size:17px;color:#1D9E75}
+.card-title{font-size:13px;font-weight:600;color:#1a1a1a}
+.card-body{padding:14px 16px}
+.chart-wrap{position:relative;height:220px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#F8F8F5;color:#888;font-weight:500;font-size:11px;padding:8px 10px;text-align:left;border-bottom:1px solid #E8E8E0}
+td{padding:8px 10px;border-bottom:1px solid #F0F0E8;color:#222}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8F8F5}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-dash{background:#F1EFE8;color:#888}
+.ng-list{list-style:none}
+.ng-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #F0F0E8;font-size:13px}
+.ng-item:last-child{border-bottom:none}
+.ng-dot{width:8px;height:8px;border-radius:50%;background:#E24B4A;flex-shrink:0;margin-top:4px}
+.ng-date{color:#888;font-size:11px;white-space:nowrap}
+.empty{text-align:center;padding:24px;color:#888;font-size:13px}
+.period-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.period-btn{padding:5px 12px;border:1px solid #CCC;border-radius:6px;background:#fff;font-size:12px;cursor:pointer;color:#555}
+.period-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75}
+@media(max-width:640px){
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .wrap{padding:12px 12px 50px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div>
+      <div class="brand">らくっく39 × HACCP管理システム ／ ケアホーム春らんまん</div>
+      <div class="page-title">管理ダッシュボード</div>
+    </div>
+    <div class="header-btns">
+      <a class="btn-check" href="index.html"><i class="ti ti-clipboard-check"></i> チェック記録へ</a>
+      <button class="btn-reload" onclick="loadData()"><i class="ti ti-refresh"></i> 最新データ取得</button>
+    </div>
+  </div>
+
+  <div class="period-row">
+    <span style="font-size:12px;color:#888">表示期間：</span>
+    <button class="period-btn active" onclick="setPeriod(7,this)">直近7日</button>
+    <button class="period-btn" onclick="setPeriod(30,this)">直近30日</button>
+    <button class="period-btn" onclick="setPeriod(90,this)">直近90日</button>
+    <button class="period-btn" onclick="setPeriod(9999,this)">全期間</button>
+  </div>
+
+  <div id="loading" class="loading"><i class="ti ti-loader"></i> データを読み込み中...</div>
+  <div id="main" style="display:none">
+
+    <div class="summary">
+      <div class="stat">
+        <div class="stat-label">総記録件数</div>
+        <div class="stat-val" id="total-count">0</div>
+        <div class="stat-sub">件</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">全項目OK率</div>
+        <div class="stat-val green" id="ok-rate">0%</div>
+        <div class="stat-sub" id="ok-sub"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">NG発生件数</div>
+        <div class="stat-val red" id="ng-count">0</div>
+        <div class="stat-sub">件（期間内）</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">直近記録日</div>
+        <div class="stat-val amber" id="last-date" style="font-size:16px;padding-top:4px">—</div>
+        <div class="stat-sub" id="last-staff"></div>
+      </div>
+    </div>
+
+    <div class="grid2">
+
+      <div class="card">
+        <div class="card-head">
+          <i class="ti ti-chart-bar card-icon"></i>
+          <span class="card-title">項目別NG発生回数</span>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="ng-chart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <i class="ti ti-temperature card-icon"></i>
+          <span class="card-title">温度推移（受取時）</span>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="temp-chart"></canvas></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <i class="ti ti-alert-circle card-icon" style="color:#E24B4A"></i>
+        <span class="card-title">NG・要注意記録</span>
+      </div>
+      <div class="card-body">
+        <ul class="ng-list" id="ng-list"></ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <i class="ti ti-list card-icon"></i>
+        <span class="card-title">記録一覧</span>
+      </div>
+      <div class="card-body" style="overflow-x:auto">
+        <table id="record-table">
+          <thead>
+            <tr>
+              <th>記録日</th>
+              <th>担当者</th>
+              <th>食数</th>
+              <th>①数量</th>
+              <th>①外観</th>
+              <th>①温度</th>
+              <th>②体調</th>
+              <th>②手洗い</th>
+              <th>③温度</th>
+              <th>④清掃</th>
+            </tr>
+          </thead>
+          <tbody id="record-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const GAS_URL='https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec';
+let allData=[];
+let periodDays=7;
+let ngChart=null;
+let tempChart=null;
+
+function setPeriod(days,btn){
+  periodDays=days;
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+async function loadData(){
+  document.getElementById('loading').style.display='block';
+  document.getElementById('main').style.display='none';
+  try{
+    const res=await fetch(GAS_URL+'?t='+Date.now());
+    const json=await res.json();
+    allData=json.data||[];
+    document.getElementById('loading').style.display='none';
+    document.getElementById('main').style.display='block';
+    renderAll();
+  }catch(err){
+    document.getElementById('loading').innerHTML='<i class="ti ti-alert-circle"></i> データの取得に失敗しました。再度お試しください。';
+  }
+}
+
+function filterByPeriod(data){
+  if(periodDays>=9999) return data;
+  const cutoff=new Date();
+  cutoff.setDate(cutoff.getDate()-periodDays);
+  return data.filter(r=>{
+    const d=new Date(r['記録日']);
+    return d>=cutoff;
+  });
+}
+
+function badge(v){
+  if(v==='OK') return '<span class="badge badge-ok">OK</span>';
+  if(v==='NG') return '<span class="badge badge-ng">NG</span>';
+  return '<span class="badge badge-dash">—</span>';
+}
+
+function renderAll(){
+  const data=filterByPeriod(allData);
+  const sorted=[...data].sort((a,b)=>new Date(b['記録日'])-new Date(a['記録日']));
+
+  // サマリー
+  document.getElementById('total-count').textContent=data.length;
+  const ngRows=data.filter(r=>
+    r['①数量確認']==='NG'||r['①外観確認']==='NG'||r['①受取温度']==='NG'||
+    r['②体調確認']==='NG'||r['②手洗い']==='NG'||
+    r['③配膳前温度']==='NG'||r['④清掃消毒']==='NG'
+  );
+  const okRows=data.filter(r=>
+    r['①数量確認']==='OK'&&r['①外観確認']==='OK'&&r['①受取温度']==='OK'&&
+    r['②体調確認']==='OK'&&r['②手洗い']==='OK'&&
+    r['③配膳前温度']==='OK'&&r['④清掃消毒']==='OK'
+  );
+  const okRate=data.length>0?Math.round(okRows.length/data.length*100):0;
+  document.getElementById('ok-rate').textContent=okRate+'%';
+  document.getElementById('ok-sub').textContent=okRows.length+'件 / '+data.length+'件';
+  document.getElementById('ng-count').textContent=ngRows.length;
+  if(sorted.length>0){
+    document.getElementById('last-date').textContent=sorted[0]['記録日'];
+    document.getElementById('last-staff').textContent=sorted[0]['担当者']||'';
+  }
+
+  // 項目別NGグラフ
+  const ngCols=['①数量確認','①外観確認','①受取温度','②体調確認','②手洗い','③配膳前温度','④清掃消毒'];
+  const ngLabels=['①数量','①外観','①受取温度','②体調','②手洗い','③配膳温度','④清掃'];
+  const ngCounts=ngCols.map(col=>data.filter(r=>r[col]==='NG').length);
+
+  if(ngChart) ngChart.destroy();
+  const ctx1=document.getElementById('ng-chart').getContext('2d');
+  ngChart=new Chart(ctx1,{
+    type:'bar',
+    data:{
+      labels:ngLabels,
+      datasets:[{
+        label:'NG件数',
+        data:ngCounts,
+        backgroundColor:'#FCEBEB',
+        borderColor:'#E24B4A',
+        borderWidth:1,
+        borderRadius:4
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'#F0F0E8'}},
+        x:{grid:{display:false}}
+      }
+    }
+  });
+
+  // 温度推移グラフ
+  const tempData=[...data]
+    .filter(r=>r['①受取温度値(℃)']&&r['①受取温度値(℃)']!=='—')
+    .sort((a,b)=>new Date(a['記録日'])-new Date(b['記録日']))
+    .slice(-20);
+
+  if(tempChart) tempChart.destroy();
+  const ctx2=document.getElementById('temp-chart').getContext('2d');
+  tempChart=new Chart(ctx2,{
+    type:'line',
+    data:{
+      labels:tempData.map(r=>r['記録日']),
+      datasets:[{
+        label:'受取温度(℃)',
+        data:tempData.map(r=>parseFloat(r['①受取温度値(℃)'])||null),
+        borderColor:'#1D9E75',
+        backgroundColor:'#E1F5EE',
+        borderWidth:2,
+        pointRadius:4,
+        pointBackgroundColor:'#1D9E75',
+        tension:0.3,
+        fill:true
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{grid:{color:'#F0F0E8'},ticks:{callback:v=>v+'℃'}},
+        x:{grid:{display:false},ticks:{maxTicksLimit:7}}
+      }
+    }
+  });
+
+  // NGリスト
+  const ngList=document.getElementById('ng-list');
+  const ngItems=sorted.filter(r=>
+    r['①数量確認']==='NG'||r['①外観確認']==='NG'||r['①受取温度']==='NG'||
+    r['②体調確認']==='NG'||r['②手洗い']==='NG'||
+    r['③配膳前温度']==='NG'||r['④清掃消毒']==='NG'
+  ).slice(0,10);
+
+  if(ngItems.length===0){
+    ngList.innerHTML='<div class="empty"><i class="ti ti-circle-check" style="color:#1D9E75;font-size:20px"></i><br>NG記録はありません</div>';
+  } else {
+    ngList.innerHTML=ngItems.map(r=>{
+      const ngCols2=[];
+      if(r['①数量確認']==='NG') ngCols2.push('①数量確認');
+      if(r['①外観確認']==='NG') ngCols2.push('①外観確認');
+      if(r['①受取温度']==='NG') ngCols2.push('①受取温度');
+      if(r['②体調確認']==='NG') ngCols2.push('②体調確認');
+      if(r['②手洗い']==='NG') ngCols2.push('②手洗い');
+      if(r['③配膳前温度']==='NG') ngCols2.push('③配膳前温度');
+      if(r['④清掃消毒']==='NG') ngCols2.push('④清掃消毒');
+      return `<li class="ng-item">
+        <div class="ng-dot"></div>
+        <div>
+          <span class="ng-date">${r['記録日']} ${r['担当者']||''}</span><br>
+          NG項目：${ngCols2.join('、')}
+          ${r['NG備考（到着時）']?'<br>備考：'+r['NG備考（到着時）']:''}
+          ${r['NG備考（配膳前）']?'<br>備考：'+r['NG備考（配膳前）']:''}
+        </div>
+      </li>`;
+    }).join('');
+  }
+
+  // 記録一覧テーブル
+  const tbody=document.getElementById('record-tbody');
+  if(sorted.length===0){
+    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;color:#888;padding:20px">記録がありません</td></tr>';
+  } else {
+    tbody.innerHTML=sorted.map(r=>`
+      <tr>
+        <td>${r['記録日']||'—'}</td>
+        <td>${r['担当者']||'—'}</td>
+        <td>${r['食数']||'—'}</td>
+        <td>${badge(r['①数量確認'])}</td>
+        <td>${badge(r['①外観確認'])}</td>
+        <td>${badge(r['①受取温度'])} ${r['①受取温度値(℃)']&&r['①受取温度値(℃)']!=='—'?r['①受取温度値(℃)']+'℃':''}</td>
+        <td>${badge(r['②体調確認'])}</td>
+        <td>${badge(r['②手洗い'])}</td>
+        <td>${badge(r['③配膳前温度'])} ${r['③配膳前温度値(℃)']&&r['③配膳前温度値(℃)']!=='—'?r['③配膳前温度値(℃)']+'℃':''}</td>
+        <td>${badge(r['④清掃消毒'])}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
