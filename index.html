@@ -62,6 +62,23 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .btn-save{padding:10px 28px;background:#1D9E75;color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
 .btn-save:hover:not(:disabled){opacity:.9}
 .btn-save:disabled{background:#CCC;cursor:not-allowed}
+.btn-staff-mgr{padding:6px 12px;background:#fff;color:#555;border:1px solid #CCC;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.btn-staff-mgr:hover{background:#F5F5F3}
+.modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:24px;width:360px;max-width:90vw;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:600;color:#1a1a1a;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#888;line-height:1}
+.staff-list{list-style:none;margin-bottom:16px}
+.staff-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #F0F0E8}
+.staff-item:last-child{border-bottom:none}
+.staff-name{flex:1;font-size:13px;color:#222}
+.btn-del{background:none;border:none;color:#CCC;cursor:pointer;font-size:16px;padding:2px 6px}
+.btn-del:hover{color:#E24B4A}
+.staff-add-row{display:flex;gap:8px}
+.staff-add-input{flex:1;border:1px solid #D0D0C8;border-radius:6px;padding:7px 10px;font-size:13px;color:#222}
+.btn-add{padding:7px 14px;background:#1D9E75;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn-add:hover{opacity:.9}
 @media(max-width:640px){
   .grid{grid-template-columns:1fr}
   .summary{grid-template-columns:repeat(2,1fr)}
@@ -87,11 +104,8 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
       <span class="meta-label">担当者</span>
       <select class="meta-select" id="staff">
         <option value="">選択してください</option>
-        <option>山田 花子</option>
-        <option>佐藤 美咲</option>
-        <option>中村 由紀</option>
-        <option>（その他）</option>
       </select>
+      <button class="btn-staff-mgr" onclick="openStaffMgr()"><i class="ti ti-users"></i> スタッフ管理</button>
       <span class="meta-label" style="margin-left:8px">食数</span>
       <input class="meta-input" type="number" id="meal-count" placeholder="例：20">
       <span class="meta-label">食</span>
@@ -226,6 +240,21 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 
 </div>
 
+<!-- スタッフ管理モーダル -->
+<div class="modal-bg" id="staff-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span><i class="ti ti-users" style="color:#1D9E75;margin-right:6px"></i>スタッフ管理</span>
+      <button class="modal-close" onclick="closeStaffMgr()">×</button>
+    </div>
+    <ul class="staff-list" id="staff-list"></ul>
+    <div class="staff-add-row">
+      <input class="staff-add-input" type="text" id="staff-new" placeholder="新しいスタッフ名を入力" onkeydown="if(event.key==='Enter')addStaff()">
+      <button class="btn-add" onclick="addStaff()"><i class="ti ti-plus"></i> 追加</button>
+    </div>
+  </div>
+</div>
+
 <!-- GAS送信用の隠しiframe -->
 <iframe name="hidden-iframe" style="display:none"></iframe>
 <!-- GAS送信用の隠しフォーム -->
@@ -249,11 +278,82 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 </form>
 
 <script>
+
+const DEFAULT_STAFF=['山田 花子','佐藤 美咲','中村 由紀'];
+
+function loadStaff(){
+  const saved=localStorage.getItem('haccp_staff');
+  return saved?JSON.parse(saved):DEFAULT_STAFF;
+}
+
+function saveStaff(list){
+  localStorage.setItem('haccp_staff',JSON.stringify(list));
+}
+
+function renderStaffSelect(){
+  const list=loadStaff();
+  const sel=document.getElementById('staff');
+  const current=sel.value;
+  sel.innerHTML='<option value="">選択してください</option>';
+  list.forEach(name=>{
+    const opt=document.createElement('option');
+    opt.value=name;opt.textContent=name;
+    sel.appendChild(opt);
+  });
+  if(current) sel.value=current;
+}
+
+function renderStaffList(){
+  const list=loadStaff();
+  const ul=document.getElementById('staff-list');
+  if(list.length===0){
+    ul.innerHTML='<li style="color:#888;font-size:13px;padding:8px 0">スタッフが登録されていません</li>';
+    return;
+  }
+  ul.innerHTML=list.map((name,i)=>`
+    <li class="staff-item">
+      <span class="staff-name">${name}</span>
+      <button class="btn-del" onclick="deleteStaff(${i})" title="削除"><i class="ti ti-trash"></i></button>
+    </li>
+  `).join('');
+}
+
+function openStaffMgr(){
+  renderStaffList();
+  document.getElementById('staff-modal').classList.add('open');
+}
+
+function closeStaffMgr(){
+  document.getElementById('staff-modal').classList.remove('open');
+  renderStaffSelect();
+}
+
+function addStaff(){
+  const input=document.getElementById('staff-new');
+  const name=input.value.trim();
+  if(!name) return;
+  const list=loadStaff();
+  if(list.includes(name)){alert('同じ名前が既に登録されています');return;}
+  list.push(name);
+  saveStaff(list);
+  input.value='';
+  renderStaffList();
+}
+
+function deleteStaff(i){
+  const list=loadStaff();
+  if(!confirm(list[i]+'を削除しますか？')) return;
+  list.splice(i,1);
+  saveStaff(list);
+  renderStaffList();
+}
+
 const state={r1:null,r2:null,r3:null,r4:null,r5:null,r6:null,r7:null};
 const TOTAL=7;
 
 const d=new Date();
 const days=['日','月','火','水','木','金','土'];
+renderStaffSelect();
 document.getElementById('date-chip').textContent=
   d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+days[d.getDay()]+'）';
 
