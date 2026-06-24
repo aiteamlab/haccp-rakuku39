@@ -170,6 +170,15 @@ tr:hover td{background:#F8F8F5}
 </div>
 
 <script>
+
+function fmtDate(v){
+  if(!v||v==='—') return '—';
+  // ISO形式 or YYYY-MM-DD どちらも対応
+  const s = String(v);
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return m[1]+'-'+m[2]+'-'+m[3];
+  return s;
+}
 const GAS_URL='https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec';
 let allData=[];
 let periodDays=7;
@@ -216,7 +225,7 @@ function badge(v){
 
 function renderAll(){
   const data=filterByPeriod(allData);
-  const sorted=[...data].sort((a,b)=>new Date(b['記録日'])-new Date(a['記録日']));
+  const sorted=[...data].sort((a,b)=>String(b['記録日']).localeCompare(String(a['記録日'])));
 
   // サマリー
   document.getElementById('total-count').textContent=data.length;
@@ -235,7 +244,7 @@ function renderAll(){
   document.getElementById('ok-sub').textContent=okRows.length+'件 / '+data.length+'件';
   document.getElementById('ng-count').textContent=ngRows.length;
   if(sorted.length>0){
-    document.getElementById('last-date').textContent=sorted[0]['記録日'];
+    document.getElementById('last-date').textContent=fmtDate(sorted[0]['記録日']);
     document.getElementById('last-staff').textContent=sorted[0]['担当者']||'';
   }
 
@@ -281,7 +290,7 @@ function renderAll(){
   tempChart=new Chart(ctx2,{
     type:'line',
     data:{
-      labels:tempData.map(r=>r['記録日']),
+      labels:tempData.map(r=>fmtDate(r['記録日'])),
       datasets:[{
         label:'受取温度(℃)',
         data:tempData.map(r=>parseFloat(r['①受取温度値(℃)'])||null),
@@ -328,7 +337,7 @@ function renderAll(){
       return `<li class="ng-item">
         <div class="ng-dot"></div>
         <div>
-          <span class="ng-date">${r['記録日']} ${r['担当者']||''}</span><br>
+          <span class="ng-date">${fmtDate(r['記録日'])} ${r['担当者']||''}</span><br>
           NG項目：${ngCols2.join('、')}
           ${r['NG備考（到着時）']?'<br>備考：'+r['NG備考（到着時）']:''}
           ${r['NG備考（配膳前）']?'<br>備考：'+r['NG備考（配膳前）']:''}
@@ -344,7 +353,7 @@ function renderAll(){
   } else {
     tbody.innerHTML=sorted.map(r=>`
       <tr>
-        <td>${r['記録日']||'—'}</td>
+        <td>${fmtDate(r['記録日'])}</td>
         <td>${r['担当者']||'—'}</td>
         <td>${r['食数']||'—'}</td>
         <td>${badge(r['①数量確認'])}</td>
