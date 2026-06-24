@@ -315,24 +315,6 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 
 const GAS_URL='https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec';
 
-// postMessageでiframeからログイン結果を受信
-window.addEventListener('message', function(e){
-  const data = e.data;
-  if(!data || !data.result) return;
-  document.getElementById('login-loading').style.display='none';
-  if(data.result==='success'){
-    sessionStorage.setItem('haccp_login','1');
-    sessionStorage.setItem('haccp_facility', data.facilityName||'—');
-    showApp(data.facilityName||'—');
-  } else if(data.result==='disabled'){
-    showLoginError('このアカウントは現在利用停止中です。らくっく39担当者にお問い合わせください。');
-    document.getElementById('login-btn').disabled=false;
-  } else {
-    showLoginError('IDまたはパスワードが正しくありません。');
-    document.getElementById('login-btn').disabled=false;
-  }
-});
-
 function doLogin(){
   const id=document.getElementById('login-id').value.trim();
   const pass=document.getElementById('login-pass').value.trim();
@@ -340,11 +322,73 @@ function doLogin(){
   document.getElementById('login-btn').disabled=true;
   document.getElementById('login-error').style.display='none';
   document.getElementById('login-loading').style.display='block';
-  // iframeにPOST送信（GASがpostMessageで結果を返す）
+
+  // hidden iframeにフォーム送信し、onloadで施設名inputを読み取る
+  const iframe=document.getElementById('login-iframe');
+  iframe.onload=function(){
+    try{
+      const val=iframe.contentDocument.body.innerText.trim();
+      if(val==='disabled'){
+        document.getElementById('login-loading').style.display='none';
+        showLoginError('このアカウントは現在利用停止中です。らくっく39担当者にお問い合わせください。');
+        document.getElementById('login-btn').disabled=false;
+      } else if(val.startsWith('{')){
+        const data=JSON.parse(val);
+        document.getElementById('login-loading').style.display='none';
+        if(data.result==='success'){
+          sessionStorage.setItem('haccp_login','1');
+          sessionStorage.setItem('haccp_facility',data.facilityName||'—');
+          showApp(data.facilityName||'—');
+        } else {
+          showLoginError('IDまたはパスワードが正しくありません。');
+          document.getElementById('login-btn').disabled=false;
+        }
+      } else {
+        document.getElementById('login-loading').style.display='none';
+        showLoginError('IDまたはパスワードが正しくありません。');
+        document.getElementById('login-btn').disabled=false;
+      }
+    }catch(ex){
+      // クロスオリジンでiframeの内容が読めない場合はGET認証にフォールバック
+      tryGetAuth(id,pass);
+    }
+  };
   document.getElementById('f-login-id').value=id;
   document.getElementById('f-login-pass').value=pass;
   document.getElementById('f-login-action').value='login';
   document.getElementById('login-form').submit();
+}
+
+function tryGetAuth(id,pass){
+  // GASのdoGetを使った認証（GASはCORSを自動許可）
+  const url=GAS_URL+'?action=check&id='+encodeURIComponent(id)+'&password='+encodeURIComponent(pass)+'&t='+Date.now();
+  fetch(url,{redirect:'follow'})
+    .then(r=>r.text())
+    .then(txt=>{
+      document.getElementById('login-loading').style.display='none';
+      try{
+        const data=JSON.parse(txt);
+        if(data.result==='success'){
+          sessionStorage.setItem('haccp_login','1');
+          sessionStorage.setItem('haccp_facility',data.facilityName||'—');
+          showApp(data.facilityName||'—');
+        } else if(data.result==='disabled'){
+          showLoginError('このアカウントは現在利用停止中です。らくっく39担当者にお問い合わせください。');
+          document.getElementById('login-btn').disabled=false;
+        } else {
+          showLoginError('IDまたはパスワードが正しくありません。');
+          document.getElementById('login-btn').disabled=false;
+        }
+      }catch(e){
+        showLoginError('IDまたはパスワードが正しくありません。');
+        document.getElementById('login-btn').disabled=false;
+      }
+    })
+    .catch(()=>{
+      document.getElementById('login-loading').style.display='none';
+      showLoginError('通信エラーが発生しました。時間をおいて再度お試しください。');
+      document.getElementById('login-btn').disabled=false;
+    });
 }
 
 function showLoginError(msg){
