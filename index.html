@@ -108,6 +108,18 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .meal-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:600}
 .meal-badge{font-size:11px;background:#E1F5EE;color:#0F6E56;padding:2px 10px;border-radius:4px;margin-left:4px;display:none}
 .meal-badge.show{display:inline-block}
+
+.card-staff{display:flex;align-items:center;gap:6px;padding:6px 6px 8px;border-bottom:1px solid #F0F0E8}
+.card-staff-label{font-size:11px;color:#888;white-space:nowrap}
+.card-staff-select{flex:1;border:1px solid #D0D0C8;border-radius:5px;padding:4px 6px;font-size:12px;color:#222;background:#fff}
+.btn-save-draft{padding:10px 20px;background:#fff;color:#1D9E75;border:1.5px solid #1D9E75;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-save-draft:hover{background:#E1F5EE}
+.draft-msg{display:none;font-size:13px;color:#BA7517;background:#FAEEDA;padding:8px 16px;border-radius:6px;border:1px solid #EF9F27;align-items:center;gap:6px}
+.incomplete-warn{display:none;font-size:12px;color:#A32D2D;background:#FCEBEB;padding:8px 12px;border-radius:6px;border:1px solid #F09595;margin-top:6px}
+.status-chip{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:500}
+.chip-done{background:#E1F5EE;color:#0F6E56}
+.chip-draft{background:#FAEEDA;color:#633806}
+.chip-empty{background:#F0F0E8;color:#888}
 @media(max-width:640px){
   .grid{grid-template-columns:1fr}
   .summary{grid-template-columns:repeat(2,1fr)}
@@ -187,6 +199,10 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <span class="card-tag">到着時</span>
       </div>
       <div class="card-body">
+        <div class="card-staff">
+          <span class="card-staff-label">担当者</span>
+          <select class="card-staff-select" id="cs1" onchange="updateSummary()"><option value="">選択</option></select>
+        </div>
         <div class="row" id="r1" onclick="tap('r1','c1')">
           <div class="chk" id="c1"><i class="ti ti-check"></i></div>
           <div style="flex:1">
@@ -226,6 +242,10 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <span class="card-tag">配膳前</span>
       </div>
       <div class="card-body">
+        <div class="card-staff">
+          <span class="card-staff-label">担当者</span>
+          <select class="card-staff-select" id="cs2" onchange="updateSummary()"><option value="">選択</option></select>
+        </div>
         <div class="row" id="r4" onclick="tap('r4','c4')">
           <div class="chk" id="c4"><i class="ti ti-check"></i></div>
           <div style="flex:1">
@@ -251,6 +271,10 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <span class="card-tag">配膳直前</span>
       </div>
       <div class="card-body">
+        <div class="card-staff">
+          <span class="card-staff-label">担当者</span>
+          <select class="card-staff-select" id="cs3" onchange="updateSummary()"><option value="">選択</option></select>
+        </div>
         <div class="row" id="r6">
           <div class="chk" id="c6"><i class="ti ti-check"></i></div>
           <div style="flex:1">
@@ -276,6 +300,10 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <span class="card-tag">調理・配膳時</span>
       </div>
       <div class="card-body">
+        <div class="card-staff">
+          <span class="card-staff-label">担当者</span>
+          <select class="card-staff-select" id="cs4" onchange="updateSummary()"><option value="">選択</option></select>
+        </div>
         <div class="row" id="r8" onclick="tap('r8','c8')">
           <div class="chk" id="c8"><i class="ti ti-check"></i></div>
           <div style="flex:1">
@@ -310,6 +338,10 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <span class="card-tag">毎日</span>
       </div>
       <div class="card-body">
+        <div class="card-staff">
+          <span class="card-staff-label">担当者</span>
+          <select class="card-staff-select" id="cs5" onchange="updateSummary()"><option value="">選択</option></select>
+        </div>
         <div class="row" id="r7" onclick="tap('r7','c7')">
           <div class="chk" id="c7"><i class="ti ti-check"></i></div>
           <div>
@@ -321,10 +353,13 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     </div>
   </div>
 
+  <div class="incomplete-warn" id="incomplete-warn"></div>
   <div class="btn-row">
+    <div class="draft-msg" id="draft-msg"><i class="ti ti-clock"></i> <span id="draft-time"></span> に途中保存しました</div>
     <div class="saved-msg" id="saved-msg"><i class="ti ti-circle-check"></i> <span id="saved-time"></span> に保存しました（スプレッドシートに記録済み）</div>
     <div class="error-msg" id="error-msg"><i class="ti ti-alert-circle"></i> 送信に失敗しました。CSV出力で手動保存してください。</div>
     <button class="btn-csv" onclick="exportCSV()"><i class="ti ti-download"></i> CSV出力</button>
+    <button class="btn-save-draft" id="draft-btn" onclick="saveDraft()"><i class="ti ti-device-floppy"></i> 途中保存</button>
     <button class="btn-save" id="save-btn" onclick="saveRecord()" disabled><i class="ti ti-device-floppy"></i> 記録を保存する</button>
   </div>
   <div id="print-btn-wrap" style="display:none;justify-content:flex-end;margin-top:10px">
@@ -381,6 +416,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   <input type="hidden" name="n4" id="f-n4">
   <input type="hidden" name="n6" id="f-n6">
   <input type="hidden" name="mealType" id="f-mealType">
+  <input type="hidden" name="status" id="f-status">
+  <input type="hidden" name="staff1" id="f-staff1">
+  <input type="hidden" name="staff2" id="f-staff2">
+  <input type="hidden" name="staff3" id="f-staff3">
+  <input type="hidden" name="staff4" id="f-staff4">
+  <input type="hidden" name="staff5" id="f-staff5">
   <input type="hidden" name="r8" id="f-r8">
   <input type="hidden" name="r9" id="f-r9">
   <input type="hidden" name="r10" id="f-r10">
@@ -476,6 +517,7 @@ function saveStaff(list){
 
 function renderStaffSelect(){
   const list=loadStaff();
+  // メインのプルダウン
   const sel=document.getElementById('staff');
   const current=sel.value;
   sel.innerHTML='<option value="">選択してください</option>';
@@ -485,6 +527,19 @@ function renderStaffSelect(){
     sel.appendChild(opt);
   });
   if(current) sel.value=current;
+  // カード別プルダウン
+  ['cs1','cs2','cs3','cs4','cs5'].forEach(id=>{
+    const cs=document.getElementById(id);
+    if(!cs) return;
+    const cv=cs.value;
+    cs.innerHTML='<option value="">選択</option>';
+    list.forEach(name=>{
+      const opt=document.createElement('option');
+      opt.value=name;opt.textContent=name;
+      cs.appendChild(opt);
+    });
+    if(cv) cs.value=cv;
+  });
 }
 
 function renderStaffList(){
@@ -619,6 +674,9 @@ function updateSummary(){
   else if(done<TOTAL){st.textContent='記録中…';st.style.color='#BA7517';}
   else if(ngCount===0){st.textContent='✓ 全項目OK';st.style.color='#1D9E75';}
   else{st.textContent='NG '+ngCount+'件あり';st.style.color='#E24B4A';}
+  // 途中保存は常に有効（1項目以上記録があれば）
+  document.getElementById('draft-btn').disabled=(done===0);
+  // 最終保存は全項目完了時のみ
   document.getElementById('save-btn').disabled=(done<TOTAL);
 }
 
@@ -666,6 +724,68 @@ function saveRecord(){
   },1500);
 }
 
+
+
+function saveDraft(){
+  const now=new Date();
+  const timeStr=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  const dateStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+
+  // 未完了項目をチェック
+  const vals=Object.values(state);
+  const done=vals.filter(v=>v!==null).length;
+  const incomplete=TOTAL-done;
+
+  // 警告表示
+  const warn=document.getElementById('incomplete-warn');
+  if(incomplete>0){
+    warn.textContent='⚠ 未完了の項目が'+incomplete+'件あります。途中保存として記録します。';
+    warn.style.display='block';
+  } else {
+    warn.style.display='none';
+  }
+
+  setFormValues(dateStr, timeStr, '途中保存');
+  document.getElementById('gas-form').submit();
+
+  setTimeout(()=>{
+    document.getElementById('draft-time').textContent=timeStr;
+    document.getElementById('draft-msg').style.display='flex';
+  },1500);
+}
+
+function setFormValues(dateStr, timeStr, status){
+  document.getElementById('f-date').value=dateStr;
+  document.getElementById('f-time').value=timeStr;
+  document.getElementById('f-status').value=status;
+  document.getElementById('f-staff').value=document.getElementById('staff').value||'未選択';
+  document.getElementById('f-facility').value=sessionStorage.getItem('haccp_facility')||'—';
+  document.getElementById('f-mealType').value=selectedMeal||'—';
+  document.getElementById('f-staff1').value=document.getElementById('cs1')?document.getElementById('cs1').value||'—':'—';
+  document.getElementById('f-staff2').value=document.getElementById('cs2')?document.getElementById('cs2').value||'—':'—';
+  document.getElementById('f-staff3').value=document.getElementById('cs3')?document.getElementById('cs3').value||'—':'—';
+  document.getElementById('f-staff4').value=document.getElementById('cs4')?document.getElementById('cs4').value||'—':'—';
+  document.getElementById('f-staff5').value=document.getElementById('cs5')?document.getElementById('cs5').value||'—':'—';
+  document.getElementById('f-r1').value=f(state.r1);
+  document.getElementById('f-r2').value=f(state.r2);
+  document.getElementById('f-r3').value=f(state.r3);
+  document.getElementById('f-t1').value=document.getElementById('t1').value||'—';
+  document.getElementById('f-r4').value=f(state.r4);
+  document.getElementById('f-r5').value=f(state.r5);
+  document.getElementById('f-r6').value=f(state.r6);
+  document.getElementById('f-t2').value=document.getElementById('t2').value||'—';
+  document.getElementById('f-r7').value=f(state.r7);
+  document.getElementById('f-r8').value=f(state.r8);
+  document.getElementById('f-r9').value=f(state.r9);
+  document.getElementById('f-r10').value=f(state.r10);
+  document.getElementById('f-r11').value=f(state.r7);
+  document.getElementById('f-n1').value=document.getElementById('n1')?document.getElementById('n1').value||'':'';
+  document.getElementById('f-n4').value=document.getElementById('n4')?document.getElementById('n4').value||'':'';
+  document.getElementById('f-n6').value=document.getElementById('n6')?document.getElementById('n6').value||'':'';
+  document.getElementById('f-n8').value=document.getElementById('n8')?document.getElementById('n8').value||'':'';
+  document.getElementById('f-n9').value=document.getElementById('n9')?document.getElementById('n9').value||'':'';
+  document.getElementById('f-n10').value=document.getElementById('n10')?document.getElementById('n10').value||'':'';
+}
 
 function printRecord(){
   document.getElementById('print-footer').style.display='block';
