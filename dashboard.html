@@ -220,11 +220,11 @@ function applyDateRange(){
 }
 
 function renderAllWithRange(from,to){
-  const fromDate=new Date(from);
-  const toDate=new Date(to);
-  toDate.setHours(23,59,59);
+  const fromDate=new Date(from+'T00:00:00');
+  const toDate=new Date(to+'T23:59:59');
   const data=allData.filter(r=>{
-    const d=new Date(String(r['記録日']).slice(0,10));
+    const dateStr=String(r['記録日']).slice(0,10);
+    const d=new Date(dateStr+'T00:00:00');
     return d>=fromDate && d<=toDate;
   });
   renderWithData(data);
