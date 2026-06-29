@@ -3,21 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>らくっく39 × HACCP 衛生チェック記録</title>
+<title>らくっく39 × 衛生管理チェック記録</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;background:#F5F5F3;color:#222;min-height:100vh}
-.wrap{max-width:920px;margin:0 auto;padding:24px 20px 60px}
+
+.login-bg{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#F5F5F3}
+.login-card{background:#fff;border:1px solid #E0E0D8;border-radius:16px;padding:36px 32px;width:360px;max-width:90vw}
+.login-logo{font-size:11px;color:#888;letter-spacing:.07em;margin-bottom:6px}
+.login-title{font-size:22px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.login-sub{font-size:12px;color:#888;margin-bottom:24px}
+.login-label{font-size:12px;color:#555;margin-bottom:4px;display:block}
+.login-input{width:100%;border:1px solid #D0D0C8;border-radius:7px;padding:10px 12px;font-size:14px;color:#222;margin-bottom:14px;box-sizing:border-box}
+.login-input:focus{outline:none;border-color:#1D9E75}
+.login-btn{width:100%;padding:12px;background:#1D9E75;color:#fff;border:none;border-radius:7px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.login-btn:hover:not(:disabled){opacity:.9}
+.login-btn:disabled{background:#CCC;cursor:not-allowed}
+.login-error{font-size:13px;color:#A32D2D;background:#FCEBEB;border:1px solid #F09595;border-radius:6px;padding:8px 12px;margin-top:12px;display:none}
+.login-loading{font-size:13px;color:#888;text-align:center;margin-top:12px;display:none}
+
+.wrap{max-width:980px;margin:0 auto;padding:24px 20px 60px}
 .header{background:#fff;border:1px solid #E0E0D8;border-radius:12px;padding:16px 20px;margin-bottom:14px}
 .header-top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px}
 .brand{font-size:11px;color:#888;letter-spacing:.07em;margin-bottom:3px}
 .page-title{font-size:20px;font-weight:600;color:#1a1a1a}
-.date-chip{font-size:13px;color:#555;background:#F1EFE8;padding:6px 14px;border-radius:6px;border:1px solid #E0E0D8;white-space:nowrap}
-.meta-row{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.date-chip{font-size:13px;color:#555;background:#F1EFE8;padding:6px 14px;border-radius:6px;border:1px solid #E0E0D8;cursor:pointer}
+.dash-link{padding:8px 16px;background:#fff;color:#555;border:1px solid #CCC;border-radius:7px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;text-decoration:none;margin-top:8px}
+.meta-row{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
 .meta-label{font-size:12px;color:#888;white-space:nowrap}
-.meta-select{border:1px solid #D0D0C8;border-radius:6px;padding:6px 10px;font-size:13px;color:#222;background:#fff;min-width:160px}
 .meta-input{border:1px solid #D0D0C8;border-radius:6px;padding:6px 10px;font-size:13px;color:#222;background:#fff;width:90px}
+.btn-staff-mgr{padding:6px 12px;background:#fff;color:#555;border:1px solid #CCC;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.btn-staff-mgr:hover{background:#F5F5F3}
+
 .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
 .stat{background:#fff;border:1px solid #E0E0D8;border-radius:10px;padding:12px 14px}
 .stat-label{font-size:11px;color:#888;margin-bottom:5px}
@@ -29,41 +47,65 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .prog-track{flex:1;height:5px;background:#E8E8E0;border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;background:#1D9E75;border-radius:3px;transition:width .3s ease}
 .prog-label{font-size:12px;color:#888;white-space:nowrap;min-width:36px;text-align:right}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
-.card{background:#fff;border:1px solid #E0E0D8;border-radius:12px;overflow:hidden}
-.card-head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#F8F8F5;border-bottom:1px solid #E8E8E0}
+
+.card{background:#fff;border:1px solid #E0E0D8;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.card-head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#F8F8F5;border-bottom:1px solid #E8E8E0;flex-wrap:wrap}
 .card-icon{font-size:17px;color:#1D9E75}
 .card-title{font-size:13px;font-weight:600;color:#1a1a1a;flex:1}
-.card-tag{font-size:11px;background:#E1F5EE;color:#0F6E56;padding:2px 9px;border-radius:4px;font-weight:500}
-.card-body{padding:10px 14px}
-.row{display:flex;align-items:flex-start;gap:10px;padding:9px 6px;border-bottom:1px solid #F0F0E8;cursor:pointer;border-radius:6px;transition:background .1s}
-.row:last-child{border-bottom:none}
-.row:hover{background:#F8F8F5}
-.row.is-ok{background:#EDFAF4}
-.row.is-ng{background:#FEF2F2}
+.card-no{font-size:11px;background:#1D9E75;color:#fff;padding:2px 8px;border-radius:10px;font-weight:600}
+.card-body{padding:12px 14px}
+
+.staff-row{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.staff-label{font-size:11px;color:#888;white-space:nowrap}
+.staff-select{flex:1;border:1px solid #D0D0C8;border-radius:5px;padding:5px 8px;font-size:12px;color:#222;background:#fff}
+
+.when-section{margin-bottom:10px}
+.when-label{font-size:11px;color:#888;margin-bottom:5px;font-weight:600}
+.when-btns{display:flex;gap:6px;flex-wrap:wrap}
+.when-btn{padding:5px 12px;border:1.5px solid #D0D0C8;border-radius:16px;background:#fff;font-size:11.5px;color:#555;cursor:pointer;font-family:inherit;transition:all .15s}
+.when-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:600}
+.when-other-input{border:1px solid #D0D0C8;border-radius:5px;padding:4px 8px;font-size:11.5px;width:140px;display:none}
+
+.howto-box{background:#F8F8F5;border-radius:6px;padding:8px 10px;font-size:11.5px;color:#666;margin-bottom:10px;line-height:1.6}
+
+.check-row{display:flex;align-items:flex-start;gap:10px;padding:8px 4px;cursor:pointer;border-radius:6px;transition:background .1s}
+.check-row:hover{background:#F8F8F5}
+.check-row.is-ok{background:#EDFAF4}
+.check-row.is-ng{background:#FEF2F2}
 .chk{width:22px;height:22px;border-radius:50%;border:1.5px solid #CCC;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .15s;color:transparent;font-size:12px}
 .chk.ok{background:#1D9E75;border-color:#1D9E75;color:#fff}
 .chk.ng{background:#E24B4A;border-color:#E24B4A;color:#fff}
 .row-label{font-size:13px;color:#1a1a1a;line-height:1.5;font-weight:500}
-.row-sub{font-size:11px;color:#888;margin-top:2px;line-height:1.5}
-.temp-row{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
-.t-input{width:72px;border:1px solid #CCC;border-radius:6px;padding:4px 6px;font-size:15px;font-weight:600;color:#222;background:#fff;text-align:center}
+
+.fridge-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.fridge-chk{display:flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid #D0D0C8;border-radius:6px;font-size:12px;cursor:pointer;background:#fff}
+.fridge-chk.active{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;font-weight:600}
+.temp-input-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+.t-input{width:70px;border:1px solid #CCC;border-radius:6px;padding:4px 6px;font-size:14px;font-weight:600;color:#222;background:#fff;text-align:center}
 .t-unit{font-size:12px;color:#888}
 .t-badge{font-size:11px;padding:3px 9px;border-radius:4px;font-weight:500}
 .t-ok{background:#E1F5EE;color:#0F6E56}
 .t-ng{background:#FCEBEB;color:#A32D2D}
-.ng-area{width:100%;margin-top:7px;border:1px solid #D0D0C8;border-radius:6px;padding:6px 8px;font-size:12px;color:#222;background:#FFF8F8;font-family:inherit;resize:vertical;line-height:1.5}
-.notice{font-size:11px;color:#633806;background:#FAEEDA;border:1px solid #EF9F27;border-radius:6px;padding:6px 10px;margin-top:8px;line-height:1.6}
+
+.ng-area{width:100%;margin-top:7px;border:1px solid #D0D0C8;border-radius:6px;padding:6px 8px;font-size:12px;color:#222;background:#FFF8F8;font-family:inherit;resize:vertical;line-height:1.5;display:none}
+
 .btn-row{display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin-top:4px}
 .saved-msg{display:none;font-size:13px;color:#0F6E56;background:#E1F5EE;padding:8px 16px;border-radius:6px;border:1px solid #9FE1CB;align-items:center;gap:6px}
+.draft-msg{display:none;font-size:13px;color:#BA7517;background:#FAEEDA;padding:8px 16px;border-radius:6px;border:1px solid #EF9F27;align-items:center;gap:6px}
 .error-msg{display:none;font-size:13px;color:#A32D2D;background:#FCEBEB;padding:8px 16px;border-radius:6px;border:1px solid #F09595;align-items:center;gap:6px}
+.incomplete-warn{display:none;font-size:12px;color:#A32D2D;background:#FCEBEB;padding:8px 12px;border-radius:6px;border:1px solid #F09595;margin-bottom:10px}
 .btn-csv{padding:9px 16px;background:#fff;color:#555;border:1px solid #CCC;border-radius:7px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px}
 .btn-csv:hover{background:#F5F5F3}
+.btn-save-draft{padding:10px 20px;background:#fff;color:#1D9E75;border:1.5px solid #1D9E75;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-save-draft:hover{background:#E1F5EE}
+.btn-save-draft:disabled{color:#CCC;border-color:#E0E0D8;cursor:not-allowed}
 .btn-save{padding:10px 28px;background:#1D9E75;color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
 .btn-save:hover:not(:disabled){opacity:.9}
 .btn-save:disabled{background:#CCC;cursor:not-allowed}
-.btn-staff-mgr{padding:6px 12px;background:#fff;color:#555;border:1px solid #CCC;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px}
-.btn-staff-mgr:hover{background:#F5F5F3}
+
+.print-footer{display:none;margin-top:16px;border-top:1px solid #E0E0D8;padding-top:10px;font-size:11px;color:#888;text-align:right}
+.btn-print{padding:10px 20px;background:#3B5BDB;color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+
 .modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:#fff;border-radius:12px;padding:24px;width:360px;max-width:90vw;max-height:80vh;overflow-y:auto}
@@ -84,65 +126,37 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .staff-add-row{display:flex;gap:8px}
 .staff-add-input{flex:1;border:1px solid #D0D0C8;border-radius:6px;padding:7px 10px;font-size:13px;color:#222}
 .btn-add{padding:7px 14px;background:#1D9E75;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;white-space:nowrap}
-.btn-add:hover{opacity:.9}
 
 @media print {
   body{background:#fff}
-  #login-screen{display:none!important}
-  .btn-row,.meta-row .btn-staff-mgr,.btn-csv,.btn-save,#print-btn-wrap{display:none!important}
-  .wrap{padding:10mm 10mm 10mm 10mm;max-width:100%}
-  .header{border-radius:0;border:1px solid #CCC;margin-bottom:8px}
-  .summary{margin-bottom:8px}
-  .stat{border:1px solid #CCC;border-radius:4px}
-  .card{border:1px solid #CCC;border-radius:4px;break-inside:avoid}
-  .grid{gap:6px;margin-bottom:8px}
+  #login-screen,.btn-row,.btn-staff-mgr,.dash-link,#print-btn-wrap{display:none!important}
+  .wrap{padding:10mm}
+  .card{break-inside:avoid}
   .print-footer{display:block!important}
-  .no-print{display:none!important}
 }
-.print-footer{display:none;margin-top:16px;border-top:1px solid #E0E0D8;padding-top:10px;font-size:11px;color:#888;text-align:right}
-.btn-print{padding:10px 20px;background:#3B5BDB;color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
-.btn-print:hover{opacity:.9}
-
-.meal-select-row{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
-.meal-btn{padding:6px 18px;border:1.5px solid #D0D0C8;border-radius:20px;background:#fff;font-size:13px;color:#555;cursor:pointer;transition:all .15s;font-family:inherit}
-.meal-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:600}
-.meal-badge{font-size:11px;background:#E1F5EE;color:#0F6E56;padding:2px 10px;border-radius:4px;margin-left:4px;display:none}
-.meal-badge.show{display:inline-block}
-
-.card-staff{display:flex;align-items:center;gap:6px;padding:6px 6px 8px;border-bottom:1px solid #F0F0E8}
-.card-staff-label{font-size:11px;color:#888;white-space:nowrap}
-.card-staff-select{flex:1;border:1px solid #D0D0C8;border-radius:5px;padding:4px 6px;font-size:12px;color:#222;background:#fff}
-.btn-save-draft{padding:10px 20px;background:#fff;color:#1D9E75;border:1.5px solid #1D9E75;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
-.btn-save-draft:hover{background:#E1F5EE}
-.draft-msg{display:none;font-size:13px;color:#BA7517;background:#FAEEDA;padding:8px 16px;border-radius:6px;border:1px solid #EF9F27;align-items:center;gap:6px}
-.incomplete-warn{display:none;font-size:12px;color:#A32D2D;background:#FCEBEB;padding:8px 12px;border-radius:6px;border:1px solid #F09595;margin-top:6px}
-.status-chip{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:500}
-.chip-done{background:#E1F5EE;color:#0F6E56}
-.chip-draft{background:#FAEEDA;color:#633806}
-.chip-empty{background:#F0F0E8;color:#888}
 @media(max-width:640px){
-  .grid{grid-template-columns:1fr}
   .summary{grid-template-columns:repeat(2,1fr)}
   .wrap{padding:12px 12px 50px}
   .page-title{font-size:17px}
   .btn-row{justify-content:stretch}
-  .btn-save,.btn-csv{flex:1;justify-content:center}
+  .btn-save,.btn-csv,.btn-save-draft{flex:1;justify-content:center}
 }
 </style>
 </head>
 <body>
-<div id="login-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#F5F5F3">
-  <div style="background:#fff;border:1px solid #E0E0D8;border-radius:16px;padding:36px 32px;width:360px;max-width:90vw">
-    <div style="font-size:11px;color:#888;letter-spacing:.07em;margin-bottom:6px">らくっく39 × HACCP管理システム</div>
-    <div style="font-size:22px;font-weight:600;color:#1a1a1a;margin-bottom:4px">ログイン</div>
-    <div style="font-size:12px;color:#888;margin-bottom:24px">担当者よりお知らせしたIDとパスワードを入力してください</div>
-    <label style="font-size:12px;color:#555;margin-bottom:4px;display:block">ログインID</label>
-    <input style="width:100%;border:1px solid #D0D0C8;border-radius:7px;padding:10px 12px;font-size:14px;color:#222;margin-bottom:14px;box-sizing:border-box" type="text" id="login-id" placeholder="ID" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
-    <label style="font-size:12px;color:#555;margin-bottom:4px;display:block">パスワード</label>
-    <input style="width:100%;border:1px solid #D0D0C8;border-radius:7px;padding:10px 12px;font-size:14px;color:#222;margin-bottom:14px;box-sizing:border-box" type="password" id="login-pass" placeholder="パスワード" onkeydown="if(event.key==='Enter')doLogin()">
-    <button style="width:100%;padding:12px;background:#1D9E75;color:#fff;border:none;border-radius:7px;font-size:15px;font-weight:600;cursor:pointer" id="login-btn" onclick="doLogin()">ログイン</button>
-    <div style="font-size:13px;color:#A32D2D;background:#FCEBEB;border:1px solid #F09595;border-radius:6px;padding:8px 12px;margin-top:12px;display:none" id="login-error"></div>
-    <div style="font-size:13px;color:#888;text-align:center;margin-top:12px;display:none" id="login-loading">認証中...</div>
+
+<div id="login-screen" class="login-bg">
+  <div class="login-card">
+    <div class="login-logo">らくっく39 × 衛生管理計画</div>
+    <div class="login-title">ログイン</div>
+    <div class="login-sub">担当者よりお知らせしたIDとパスワードを入力してください</div>
+    <label class="login-label">ログインID</label>
+    <input class="login-input" type="text" id="login-id" placeholder="ID" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+    <label class="login-label">パスワード</label>
+    <input class="login-input" type="password" id="login-pass" placeholder="パスワード" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" id="login-btn" onclick="doLogin()">ログイン</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-loading" id="login-loading">認証中...</div>
   </div>
 </div>
 
@@ -152,30 +166,19 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   <div class="header">
     <div class="header-top">
       <div>
-        <div class="brand">らくっく39 × HACCP管理システム ／ <span id="facility-name-header">—</span></div>
-        <div class="page-title">衛生チェック記録表</div>
+        <div class="brand">らくっく39 × 衛生管理計画 ／ <span id="facility-name-header">—</span></div>
+        <div class="page-title">衛生管理チェック記録表</div>
       </div>
-      <div class="date-chip" id="date-chip"></div>
-    </div>
-    <div style="margin-top:10px;display:flex;justify-content:flex-end">
-      <a href="dashboard.html" style="padding:6px 14px;background:#fff;color:#555;border:1px solid #CCC;border-radius:6px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;text-decoration:none"><i class="ti ti-chart-bar"></i> ダッシュボードへ</a>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <input type="date" id="date-chip" class="date-chip" onchange="onDateChange(this.value)">
+        <a href="dashboard.html" class="dash-link"><i class="ti ti-chart-bar"></i> ダッシュボードへ</a>
+      </div>
     </div>
     <div class="meta-row">
-      <span class="meta-label">担当者</span>
-      <select class="meta-select" id="staff">
-        <option value="">選択してください</option>
-      </select>
-      <button class="btn-staff-mgr" onclick="openStaffMgr()"><i class="ti ti-users"></i> スタッフ管理</button>
-      <span class="meta-label" style="margin-left:8px">食数</span>
+      <span class="meta-label">食数</span>
       <input class="meta-input" type="number" id="meal-count" placeholder="例：20">
       <span class="meta-label">食</span>
-    </div>
-    <div class="meal-select-row">
-      <span class="meta-label">食事区分</span>
-      <button class="meal-btn" id="meal-btn-morning" onclick="selectMeal('朝食')">🌅 朝食</button>
-      <button class="meal-btn" id="meal-btn-lunch" onclick="selectMeal('昼食')">☀️ 昼食</button>
-      <button class="meal-btn" id="meal-btn-dinner" onclick="selectMeal('夕食')">🌙 夕食</button>
-      <span class="meal-badge" id="meal-badge"></span>
+      <button class="btn-staff-mgr" onclick="openStaffMgr()"><i class="ti ti-users"></i> スタッフ管理</button>
     </div>
   </div>
 
@@ -191,163 +194,247 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     <div class="prog-label" id="prog-txt">0%</div>
   </div>
 
-  <div class="grid">
-    <div class="card">
-      <div class="card-head">
-        <i class="ti ti-clipboard-check card-icon"></i>
-        <span class="card-title">① お食事の受取確認</span>
-        <span class="card-tag">到着時</span>
+  <!-- ① 原材料の受入確認 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">①</span>
+      <i class="ti ti-truck-delivery card-icon"></i>
+      <span class="card-title">原材料の受入の確認</span>
+    </div>
+    <div class="card-body">
+      <div class="staff-row">
+        <span class="staff-label">担当者</span>
+        <select class="staff-select" id="cs1"><option value="">選択</option></select>
       </div>
-      <div class="card-body">
-        <div class="card-staff">
-          <span class="card-staff-label">担当者</span>
-          <select class="card-staff-select" id="cs1" onchange="updateSummary()"><option value="">選択</option></select>
+      <div class="when-section">
+        <div class="when-label">いつ</div>
+        <div class="when-btns" id="when1">
+          <button class="when-btn" onclick="selectWhen(1,'納入時',this)">納入時</button>
+          <button class="when-btn" onclick="selectWhen(1,'その他',this)">その他</button>
         </div>
-        <div class="row" id="r1" onclick="tap('r1','c1')">
-          <div class="chk" id="c1"><i class="ti ti-check"></i></div>
-          <div style="flex:1">
-            <div class="row-label">数量が注文通りか確認</div>
-            <div class="row-sub">納品書と食数が一致しているか</div>
-            <textarea class="ng-area" id="n1" rows="2" placeholder="相違があった場合：内容を記入（例：3食不足、らくっく39に連絡済み）" style="display:none" onclick="event.stopPropagation()"></textarea>
-          </div>
-        </div>
-        <div class="row" id="r2" onclick="tap('r2','c2')">
-          <div class="chk" id="c2"><i class="ti ti-check"></i></div>
-          <div style="flex:1">
-            <div class="row-label">外観・梱包に異常なし</div>
-            <div class="row-sub">容器の破損・変形・液漏れ・異臭がないか確認</div>
-            <textarea class="ng-area" id="n2" rows="2" placeholder="異常があった場合：内容と対応を記入" style="display:none" onclick="event.stopPropagation()"></textarea>
-          </div>
-        </div>
-        <div class="row" id="r3">
-          <div class="chk" id="c3"><i class="ti ti-check"></i></div>
-          <div style="flex:1">
-            <div class="row-label">受取時の温度確認</div>
-            <div class="row-sub">冷蔵：〇℃以下 ／ 温製：〇℃以上（施設基準）</div>
-            <div class="temp-row">
-              <input class="t-input" type="number" id="t1" placeholder="—" oninput="tempCheck(this,'tb1',10,'below','r3','c3','n3')" onclick="event.stopPropagation()">
-              <span class="t-unit">℃</span>
-              <span class="t-badge" id="tb1"></span>
-            </div>
-            <textarea class="ng-area" id="n3" rows="2" placeholder="基準外の場合：らくっく39に連絡・使用可否を確認" style="display:none" onclick="event.stopPropagation()"></textarea>
-          </div>
+        <input type="text" class="when-other-input" id="when1-other" placeholder="その他の内容">
+      </div>
+      <div class="howto-box">📋 どのように：外観、におい、包装の状態、表示（期限、保存方法）を確認する。</div>
+      <div class="check-row" id="r1" onclick="tap('r1','c1')">
+        <div class="chk" id="c1"><i class="ti ti-check"></i></div>
+        <div style="flex:1">
+          <div class="row-label">確認OK（異常なし）</div>
+          <textarea class="ng-area" id="n1" rows="2" placeholder="問題があった場合：返品し、交換する旨を記入"></textarea>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="card-head">
-        <i class="ti ti-heart-rate-monitor card-icon"></i>
-        <span class="card-title">② 配膳スタッフ 健康確認</span>
-        <span class="card-tag">配膳前</span>
+  <!-- ② 庫内温度の確認 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">②</span>
+      <i class="ti ti-temperature-snow card-icon"></i>
+      <span class="card-title">庫内温度の確認（冷蔵庫・冷凍庫）</span>
+    </div>
+    <div class="card-body">
+      <div class="staff-row">
+        <span class="staff-label">担当者</span>
+        <select class="staff-select" id="cs2"><option value="">選択</option></select>
       </div>
-      <div class="card-body">
-        <div class="card-staff">
-          <span class="card-staff-label">担当者</span>
-          <select class="card-staff-select" id="cs2" onchange="updateSummary()"><option value="">選択</option></select>
+      <div class="when-section">
+        <div class="when-label">いつ</div>
+        <div class="when-btns" id="when2">
+          <button class="when-btn" onclick="selectWhen(2,'始業前',this)">始業前</button>
+          <button class="when-btn" onclick="selectWhen(2,'作業中',this)">作業中</button>
+          <button class="when-btn" onclick="selectWhen(2,'業務終了後',this)">業務終了後</button>
+          <button class="when-btn" onclick="selectWhen(2,'その他',this)">その他</button>
         </div>
-        <div class="row" id="r4" onclick="tap('r4','c4')">
-          <div class="chk" id="c4"><i class="ti ti-check"></i></div>
-          <div style="flex:1">
-            <div class="row-label">体調不良・発熱・消化器症状なし</div>
-            <div class="row-sub">37.5℃以上・下痢・嘔吐がある場合は配膳不可</div>
-            <textarea class="ng-area" id="n4" rows="2" placeholder="NGの場合：症状と代替スタッフ名を記入" style="display:none" onclick="event.stopPropagation()"></textarea>
-          </div>
+        <input type="text" class="when-other-input" id="when2-other" placeholder="その他の内容">
+      </div>
+      <div class="fridge-row">
+        <div class="fridge-chk" id="fridge-cold" onclick="toggleFridge('cold')"><i class="ti ti-snowflake"></i> 冷蔵庫</div>
+        <div class="fridge-chk" id="fridge-frozen" onclick="toggleFridge('frozen')"><i class="ti ti-temperature-minus"></i> 冷凍庫</div>
+      </div>
+      <div class="howto-box">📋 どのように：温度計で庫内温度を確認する。（冷蔵：10℃以下、冷凍：-15℃以下）</div>
+      <div id="fridge-cold-input" style="display:none">
+        <div class="temp-input-row">
+          <span style="font-size:12px;color:#888">冷蔵庫</span>
+          <input class="t-input" type="number" id="t-cold" placeholder="—" oninput="tempCheck(this,'tb-cold',10,'below','r2a','c2a','n2a')">
+          <span class="t-unit">℃</span>
+          <span class="t-badge" id="tb-cold"></span>
         </div>
-        <div class="row" id="r5" onclick="tap('r5','c5')">
-          <div class="chk" id="c5"><i class="ti ti-check"></i></div>
-          <div>
-            <div class="row-label">石けん手洗い・アルコール消毒を実施</div>
-            <div class="row-sub">石けんで30秒以上 → 水洗い → アルコール消毒</div>
-          </div>
+      </div>
+      <div id="fridge-frozen-input" style="display:none">
+        <div class="temp-input-row">
+          <span style="font-size:12px;color:#888">冷凍庫</span>
+          <input class="t-input" type="number" id="t-frozen" placeholder="—" oninput="tempCheck(this,'tb-frozen',-15,'below','r2b','c2b','n2b')">
+          <span class="t-unit">℃</span>
+          <span class="t-badge" id="tb-frozen"></span>
+        </div>
+      </div>
+      <textarea class="ng-area" id="n2" rows="2" placeholder="問題があった場合：原因確認・設定温度再確認・使用中止または加熱提供などを記入" style="margin-top:8px"></textarea>
+    </div>
+  </div>
+
+  <!-- ③-1 交差汚染・二次汚染の防止 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">③-1</span>
+      <i class="ti ti-shield-check card-icon"></i>
+      <span class="card-title">交差汚染・二次汚染の防止</span>
+    </div>
+    <div class="card-body">
+      <div class="staff-row">
+        <span class="staff-label">担当者</span>
+        <select class="staff-select" id="cs3"><option value="">選択</option></select>
+      </div>
+      <div class="when-section">
+        <div class="when-label">いつ</div>
+        <div class="when-btns" id="when3">
+          <button class="when-btn" onclick="selectWhen(3,'始業前',this)">始業前</button>
+          <button class="when-btn" onclick="selectWhen(3,'作業中',this)">作業中</button>
+          <button class="when-btn" onclick="selectWhen(3,'業務終了後',this)">業務終了後</button>
+          <button class="when-btn" onclick="selectWhen(3,'その他',this)">その他</button>
+        </div>
+        <input type="text" class="when-other-input" id="when3-other" placeholder="その他の内容">
+      </div>
+      <div class="howto-box">📋 どのように：冷蔵庫内の保管状況を確認する。まな板や包丁等の器具類は用途別に使い分け、扱った都度十分洗浄し、消毒する。</div>
+      <div class="check-row" id="r3" onclick="tap('r3','c3')">
+        <div class="chk" id="c3"><i class="ti ti-check"></i></div>
+        <div style="flex:1">
+          <div class="row-label">確認OK（汚染なし）</div>
+          <textarea class="ng-area" id="n3" rows="2" placeholder="問題があった場合：加熱提供または使用中止・再洗浄消毒などを記入"></textarea>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="card-head">
-        <i class="ti ti-bowl-chopsticks card-icon"></i>
-        <span class="card-title">③ 配膳前の確認</span>
-        <span class="card-tag">配膳直前</span>
-      </div>
-      <div class="card-body">
-        <div class="card-staff">
-          <span class="card-staff-label">担当者</span>
-          <select class="card-staff-select" id="cs3" onchange="updateSummary()"><option value="">選択</option></select>
-        </div>
-        <div class="row" id="r6">
-          <div class="chk" id="c6"><i class="ti ti-check"></i></div>
-          <div style="flex:1">
-            <div class="row-label">配膳直前の温度確認</div>
-            <div class="row-sub">温製：〇℃以上 ／ 冷蔵：〇℃以下（施設基準）</div>
-            <div class="temp-row">
-              <input class="t-input" type="number" id="t2" placeholder="—" oninput="tempCheck(this,'tb2',65,'above','r6','c6','n6')" onclick="event.stopPropagation()">
-              <span class="t-unit">℃</span>
-              <span class="t-badge" id="tb2"></span>
-            </div>
-            <textarea class="ng-area" id="n6" rows="2" placeholder="基準外の場合：再加熱または廃棄の対応を記入" style="display:none" onclick="event.stopPropagation()"></textarea>
-          </div>
-        </div>
-        <div class="notice">⚠ アレルギー対応食がある場合は、対象利用者への誤提供がないか必ず確認してください。</div>
-      </div>
+  <!-- ③-2 器具等の洗浄・消毒・殺菌 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">③-2</span>
+      <i class="ti ti-tools card-icon"></i>
+      <span class="card-title">器具等の洗浄・消毒・殺菌</span>
     </div>
-
-
-    <div class="card">
-      <div class="card-head">
-        <i class="ti ti-temperature-plus card-icon"></i>
-        <span class="card-title">⑤ 食材の温度管理</span>
-        <span class="card-tag">調理・配膳時</span>
+    <div class="card-body">
+      <div class="staff-row">
+        <span class="staff-label">担当者</span>
+        <select class="staff-select" id="cs4"><option value="">選択</option></select>
       </div>
-      <div class="card-body">
-        <div class="card-staff">
-          <span class="card-staff-label">担当者</span>
-          <select class="card-staff-select" id="cs4" onchange="updateSummary()"><option value="">選択</option></select>
+      <div class="when-section">
+        <div class="when-label">いつ</div>
+        <div class="when-btns" id="when4">
+          <button class="when-btn" onclick="selectWhen(4,'始業前',this)">始業前</button>
+          <button class="when-btn" onclick="selectWhen(4,'使用後',this)">使用後</button>
+          <button class="when-btn" onclick="selectWhen(4,'業務終了後',this)">業務終了後</button>
+          <button class="when-btn" onclick="selectWhen(4,'その他',this)">その他</button>
         </div>
-        <div class="row" id="r8" onclick="tap('r8','c8')">
-          <div class="chk" id="c8"><i class="ti ti-check"></i></div>
-          <div style="flex:1">
-            <div class="row-label">非加熱食品（冷蔵品）の状態確認</div>
-            <div class="row-sub">サラダ等の冷蔵品：冷たいまま提供できる状態か</div>
-            <textarea class="ng-area" id="n8" rows="2" placeholder="否の場合：対応内容を記入" style="display:none" onclick="event.stopPropagation()"></textarea>
-          </div>
-        </div>
-        <div class="row" id="r9" onclick="tap('r9','c9')">
-          <div class="chk" id="c9"><i class="ti ti-check"></i></div>
-          <div style="flex:1">
-            <div class="row-label">加熱食品の温度確認</div>
-            <div class="row-sub">ごはん・味噌汁・焼き物・煮物等：熱いまま提供できる状態か</div>
-            <textarea class="ng-area" id="n9" rows="2" placeholder="否の場合：対応内容を記入" style="display:none" onclick="event.stopPropagation()"></textarea>
-          </div>
-        </div>
-        <div class="row" id="r10" onclick="tap('r10','c10')">
-          <div class="chk" id="c10"><i class="ti ti-check"></i></div>
-          <div style="flex:1">
-            <div class="row-label">和え物・お浸し等の確認</div>
-            <div class="row-sub">加熱後冷却した食品：適切に冷却されているか</div>
-            <textarea class="ng-area" id="n10" rows="2" placeholder="否の場合：対応内容を記入" style="display:none" onclick="event.stopPropagation()"></textarea>
-          </div>
+        <input type="text" class="when-other-input" id="when4-other" placeholder="その他の内容">
+      </div>
+      <div class="howto-box">📋 どのように：使用の都度、ざる・ミキサー・ボウル等の器具類を洗浄し、消毒する。</div>
+      <div class="check-row" id="r4" onclick="tap('r4','c4')">
+        <div class="chk" id="c4"><i class="ti ti-check"></i></div>
+        <div style="flex:1">
+          <div class="row-label">確認OK（洗浄・消毒完了）</div>
+          <textarea class="ng-area" id="n4" rows="2" placeholder="問題があった場合：再度洗剤で洗浄し消毒する旨を記入"></textarea>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="card-head">
-        <i class="ti ti-spray card-icon"></i>
-        <span class="card-title">⑥ 清掃・消毒記録</span>
-        <span class="card-tag">毎日</span>
+  <!-- ③-3 トイレの洗浄・消毒 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">③-3</span>
+      <i class="ti ti-toilet-paper card-icon"></i>
+      <span class="card-title">トイレの洗浄・消毒</span>
+    </div>
+    <div class="card-body">
+      <div class="staff-row">
+        <span class="staff-label">担当者</span>
+        <select class="staff-select" id="cs5"><option value="">選択</option></select>
       </div>
-      <div class="card-body">
-        <div class="card-staff">
-          <span class="card-staff-label">担当者</span>
-          <select class="card-staff-select" id="cs5" onchange="updateSummary()"><option value="">選択</option></select>
+      <div class="when-section">
+        <div class="when-label">いつ</div>
+        <div class="when-btns" id="when5">
+          <button class="when-btn" onclick="selectWhen(5,'始業前',this)">始業前</button>
+          <button class="when-btn" onclick="selectWhen(5,'作業中',this)">作業中</button>
+          <button class="when-btn" onclick="selectWhen(5,'業務終了後',this)">業務終了後</button>
+          <button class="when-btn" onclick="selectWhen(5,'その他',this)">その他</button>
         </div>
-        <div class="row" id="r7" onclick="tap('r7','c7')">
-          <div class="chk" id="c7"><i class="ti ti-check"></i></div>
-          <div>
-            <div class="row-label">配膳台・トレイ・カトラリーの清拭・消毒完了</div>
-            <div class="row-sub">アルコール70%以上で清拭、自然乾燥させること</div>
-          </div>
+        <input type="text" class="when-other-input" id="when5-other" placeholder="その他の内容">
+      </div>
+      <div class="howto-box">📋 どのように：トイレの洗浄・消毒を行う。特に便座、水洗レバー、手すり、ドアノブ等は入念に消毒する。</div>
+      <div class="check-row" id="r5" onclick="tap('r5','c5')">
+        <div class="chk" id="c5"><i class="ti ti-check"></i></div>
+        <div style="flex:1">
+          <div class="row-label">確認OK（洗浄・消毒完了）</div>
+          <textarea class="ng-area" id="n5" rows="2" placeholder="問題があった場合：再度洗剤で洗浄し消毒する旨を記入"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④-1 従業員の健康管理 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">④-1</span>
+      <i class="ti ti-heart-rate-monitor card-icon"></i>
+      <span class="card-title">従業員の健康管理等</span>
+    </div>
+    <div class="card-body">
+      <div class="staff-row">
+        <span class="staff-label">担当者</span>
+        <select class="staff-select" id="cs6"><option value="">選択</option></select>
+      </div>
+      <div class="when-section">
+        <div class="when-label">いつ</div>
+        <div class="when-btns" id="when6">
+          <button class="when-btn" onclick="selectWhen(6,'始業前',this)">始業前</button>
+          <button class="when-btn" onclick="selectWhen(6,'作業中',this)">作業中</button>
+          <button class="when-btn" onclick="selectWhen(6,'その他',this)">その他</button>
+        </div>
+        <input type="text" class="when-other-input" id="when6-other" placeholder="その他の内容">
+      </div>
+      <div class="howto-box">📋 どのように：従業員の体調、手の傷の有無、着衣等の確認を行う。</div>
+      <div class="check-row" id="r6" onclick="tap('r6','c6')">
+        <div class="chk" id="c6"><i class="ti ti-check"></i></div>
+        <div style="flex:1">
+          <div class="row-label">確認OK（健康状態に問題なし）</div>
+          <textarea class="ng-area" id="n6" rows="2" placeholder="問題があった場合：就業制限・絆創膏使用・着衣交換などを記入"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④-2 手洗いの実施 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">④-2</span>
+      <i class="ti ti-droplet card-icon"></i>
+      <span class="card-title">手洗いの実施</span>
+    </div>
+    <div class="card-body">
+      <div class="staff-row">
+        <span class="staff-label">担当者</span>
+        <select class="staff-select" id="cs7"><option value="">選択</option></select>
+      </div>
+      <div class="when-section">
+        <div class="when-label">いつ</div>
+        <div class="when-btns" id="when7">
+          <button class="when-btn" onclick="selectWhen(7,'トイレの後',this)">トイレの後</button>
+          <button class="when-btn" onclick="selectWhen(7,'調理施設に入る前',this)">調理施設に入る前</button>
+          <button class="when-btn" onclick="selectWhen(7,'盛り付けの前',this)">盛り付けの前</button>
+          <button class="when-btn" onclick="selectWhen(7,'作業内容変更時',this)">作業内容変更時</button>
+          <button class="when-btn" onclick="selectWhen(7,'生肉や生魚を扱った後',this)">生肉や生魚を扱った後</button>
+          <button class="when-btn" onclick="selectWhen(7,'金銭をさわった後',this)">金銭をさわった後</button>
+          <button class="when-btn" onclick="selectWhen(7,'清掃を行った後',this)">清掃を行った後</button>
+          <button class="when-btn" onclick="selectWhen(7,'その他',this)">その他</button>
+        </div>
+        <input type="text" class="when-other-input" id="when7-other" placeholder="その他の内容">
+      </div>
+      <div class="howto-box">📋 どのように：衛生的な手洗いを行う。</div>
+      <div class="check-row" id="r7" onclick="tap('r7','c7')">
+        <div class="chk" id="c7"><i class="ti ti-check"></i></div>
+        <div style="flex:1">
+          <div class="row-label">確認OK（適切に実施）</div>
+          <textarea class="ng-area" id="n7" rows="2" placeholder="問題があった場合：即時手洗いを行わせた旨を記入"></textarea>
         </div>
       </div>
     </div>
@@ -359,16 +446,17 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     <div class="saved-msg" id="saved-msg"><i class="ti ti-circle-check"></i> <span id="saved-time"></span> に保存しました（スプレッドシートに記録済み）</div>
     <div class="error-msg" id="error-msg"><i class="ti ti-alert-circle"></i> 送信に失敗しました。CSV出力で手動保存してください。</div>
     <button class="btn-csv" onclick="exportCSV()"><i class="ti ti-download"></i> CSV出力</button>
-    <button class="btn-save-draft" id="draft-btn" onclick="saveDraft()"><i class="ti ti-device-floppy"></i> 途中保存</button>
+    <button class="btn-save-draft" id="draft-btn" onclick="saveDraft()" disabled><i class="ti ti-device-floppy"></i> 途中保存</button>
     <button class="btn-save" id="save-btn" onclick="saveRecord()" disabled><i class="ti ti-device-floppy"></i> 記録を保存する</button>
   </div>
   <div id="print-btn-wrap" style="display:none;justify-content:flex-end;margin-top:10px">
     <button class="btn-print" onclick="printRecord()"><i class="ti ti-printer"></i> この記録を印刷する</button>
   </div>
   <div class="print-footer" id="print-footer">
-    らくっく39 × HACCP管理システム ／ <span id="print-facility"></span> ／ 記録日：<span id="print-date"></span> ／ 担当者：<span id="print-staff-name"></span>
+    らくっく39 × 衛生管理計画 ／ <span id="print-facility"></span> ／ 記録日：<span id="print-date"></span>
   </div>
 
+</div>
 </div>
 
 <!-- スタッフ管理モーダル -->
@@ -396,43 +484,54 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 
 <!-- GAS送信用の隠しiframe -->
 <iframe name="hidden-iframe" style="display:none"></iframe>
-<!-- GAS送信用の隠しフォーム -->
 <form id="gas-form" method="POST" action="https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec" target="hidden-iframe" style="display:none">
-  <input type="hidden" name="facilityName" id="f-facility">
   <input type="hidden" name="date" id="f-date">
   <input type="hidden" name="time" id="f-time">
-  <input type="hidden" name="staff" id="f-staff">
-  <input type="hidden" name="meals" id="f-meals">
-  <input type="hidden" name="r1" id="f-r1">
-  <input type="hidden" name="r2" id="f-r2">
-  <input type="hidden" name="r3" id="f-r3">
-  <input type="hidden" name="t1" id="f-t1">
-  <input type="hidden" name="r4" id="f-r4">
-  <input type="hidden" name="r5" id="f-r5">
-  <input type="hidden" name="r6" id="f-r6">
-  <input type="hidden" name="t2" id="f-t2">
-  <input type="hidden" name="r7" id="f-r7">
-  <input type="hidden" name="n1" id="f-n1">
-  <input type="hidden" name="n4" id="f-n4">
-  <input type="hidden" name="n6" id="f-n6">
-  <input type="hidden" name="mealType" id="f-mealType">
   <input type="hidden" name="status" id="f-status">
+  <input type="hidden" name="facilityName" id="f-facility">
+  <input type="hidden" name="meals" id="f-meals">
+
   <input type="hidden" name="staff1" id="f-staff1">
+  <input type="hidden" name="when1" id="f-when1">
+  <input type="hidden" name="r1" id="f-r1">
+  <input type="hidden" name="n1" id="f-n1">
+
   <input type="hidden" name="staff2" id="f-staff2">
+  <input type="hidden" name="when2" id="f-when2">
+  <input type="hidden" name="fridgeCold" id="f-fridgeCold">
+  <input type="hidden" name="fridgeFrozen" id="f-fridgeFrozen">
+  <input type="hidden" name="tCold" id="f-tCold">
+  <input type="hidden" name="tFrozen" id="f-tFrozen">
+  <input type="hidden" name="r2" id="f-r2">
+  <input type="hidden" name="n2" id="f-n2">
+
   <input type="hidden" name="staff3" id="f-staff3">
+  <input type="hidden" name="when3" id="f-when3">
+  <input type="hidden" name="r3" id="f-r3">
+  <input type="hidden" name="n3" id="f-n3">
+
   <input type="hidden" name="staff4" id="f-staff4">
+  <input type="hidden" name="when4" id="f-when4">
+  <input type="hidden" name="r4" id="f-r4">
+  <input type="hidden" name="n4" id="f-n4">
+
   <input type="hidden" name="staff5" id="f-staff5">
-  <input type="hidden" name="r8" id="f-r8">
-  <input type="hidden" name="r9" id="f-r9">
-  <input type="hidden" name="r10" id="f-r10">
-  <input type="hidden" name="r11" id="f-r11">
-  <input type="hidden" name="n8" id="f-n8">
-  <input type="hidden" name="n9" id="f-n9">
-  <input type="hidden" name="n10" id="f-n10">
+  <input type="hidden" name="when5" id="f-when5">
+  <input type="hidden" name="r5" id="f-r5">
+  <input type="hidden" name="n5" id="f-n5">
+
+  <input type="hidden" name="staff6" id="f-staff6">
+  <input type="hidden" name="when6" id="f-when6">
+  <input type="hidden" name="r6" id="f-r6">
+  <input type="hidden" name="n6" id="f-n6">
+
+  <input type="hidden" name="staff7" id="f-staff7">
+  <input type="hidden" name="when7" id="f-when7">
+  <input type="hidden" name="r7" id="f-r7">
+  <input type="hidden" name="n7" id="f-n7">
 </form>
 
 <script>
-
 const GAS_URL='https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec';
 
 function doLogin(){
@@ -442,7 +541,6 @@ function doLogin(){
   document.getElementById('login-btn').disabled=true;
   document.getElementById('login-error').style.display='none';
   document.getElementById('login-loading').style.display='block';
-
   const iframe=document.getElementById('login-iframe');
   iframe.onload=function(){
     setTimeout(function(){
@@ -471,7 +569,6 @@ function doLogin(){
   };
   document.getElementById('f-login-id').value=id;
   document.getElementById('f-login-pass').value=pass;
-  document.getElementById('f-login-action').value='login';
   document.getElementById('login-form').submit();
 }
 
@@ -486,49 +583,25 @@ function showApp(facilityName){
   document.getElementById('facility-name-header').textContent=facilityName;
 }
 
-
-function selectMeal(type){
-  selectedMeal=type;
-  document.querySelectorAll('.meal-btn').forEach(b=>b.classList.remove('active'));
-  const ids={'朝食':'meal-btn-morning','昼食':'meal-btn-lunch','夕食':'meal-btn-dinner'};
-  document.getElementById(ids[type]).classList.add('active');
-  const badge=document.getElementById('meal-badge');
-  badge.textContent=type+'を記録中';
-  badge.classList.add('show');
-}
-
 function checkSession(){
   const login=sessionStorage.getItem('haccp_login');
   const facility=sessionStorage.getItem('haccp_facility');
   if(login==='1'&&facility) showApp(facility);
 }
 
-
+// ===== スタッフ管理 =====
 const DEFAULT_STAFF=['山田 花子','佐藤 美咲','中村 由紀'];
+const STAFF_SELECT_IDS=['cs1','cs2','cs3','cs4','cs5','cs6','cs7'];
 
 function loadStaff(){
   const saved=localStorage.getItem('haccp_staff');
   return saved?JSON.parse(saved):DEFAULT_STAFF;
 }
-
-function saveStaff(list){
-  localStorage.setItem('haccp_staff',JSON.stringify(list));
-}
+function saveStaff(list){ localStorage.setItem('haccp_staff',JSON.stringify(list)); }
 
 function renderStaffSelect(){
   const list=loadStaff();
-  // メインのプルダウン
-  const sel=document.getElementById('staff');
-  const current=sel.value;
-  sel.innerHTML='<option value="">選択してください</option>';
-  list.forEach(name=>{
-    const opt=document.createElement('option');
-    opt.value=name;opt.textContent=name;
-    sel.appendChild(opt);
-  });
-  if(current) sel.value=current;
-  // カード別プルダウン
-  ['cs1','cs2','cs3','cs4','cs5'].forEach(id=>{
+  STAFF_SELECT_IDS.forEach(id=>{
     const cs=document.getElementById(id);
     if(!cs) return;
     const cv=cs.value;
@@ -580,19 +653,17 @@ function saveEdit(i){
   list[i]=newName;
   saveStaff(list);
   renderStaffList();
+  renderStaffSelect();
 }
 
 function openStaffMgr(){
   renderStaffList();
   document.getElementById('staff-modal').classList.add('open');
 }
-
 function closeStaffMgr(){
   document.getElementById('staff-modal').classList.remove('open');
-  checkSession();
-renderStaffSelect();
+  renderStaffSelect();
 }
-
 function addStaff(){
   const input=document.getElementById('staff-new');
   const name=input.value.trim();
@@ -604,7 +675,6 @@ function addStaff(){
   input.value='';
   renderStaffList();
 }
-
 function deleteStaff(i){
   const list=loadStaff();
   if(!confirm(list[i]+'を削除しますか？')) return;
@@ -613,17 +683,15 @@ function deleteStaff(i){
   renderStaffList();
 }
 
-const state={r1:null,r2:null,r3:null,r4:null,r5:null,r6:null,r7:null,r8:null,r9:null,r10:null,r11:null};
-let selectedMeal='';
-
-const TOTAL=11;
+// ===== チェック状態管理 =====
+const state={r1:null,r2:null,r3:null,r4:null,r5:null,r6:null,r7:null};
+const whenSelected={1:'',2:'',3:'',4:'',5:'',6:'',7:''};
+const fridgeSelected={cold:false,frozen:false};
+const TOTAL=7;
 
 const d=new Date();
 const days=['日','月','火','水','木','金','土'];
-checkSession();
-renderStaffSelect();
-document.getElementById('date-chip').textContent=
-  d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+days[d.getDay()]+'）';
+const todayStr=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 
 function tap(rid,cid){
   state[rid]=state[rid]===true?null:true;
@@ -635,26 +703,69 @@ function render(rid,cid){
   const v=state[rid];
   const row=document.getElementById(rid);
   const chk=document.getElementById(cid);
+  if(!row||!chk) return;
   row.classList.remove('is-ok','is-ng');
   chk.classList.remove('ok','ng');
   if(v===true){chk.classList.add('ok');row.classList.add('is-ok');}
   else if(v===false){chk.classList.add('ng');row.classList.add('is-ng');}
-  const noteId='n'+cid.slice(1);
+  const noteId='n'+rid.slice(1);
   const note=document.getElementById(noteId);
   if(note) note.style.display=(v===false)?'block':'none';
+}
+
+function selectWhen(num,label,btn){
+  whenSelected[num]=label;
+  const group=document.getElementById('when'+num);
+  group.querySelectorAll('.when-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const otherInput=document.getElementById('when'+num+'-other');
+  if(label==='その他'){
+    otherInput.style.display='inline-block';
+  } else {
+    otherInput.style.display='none';
+  }
+}
+
+function toggleFridge(type){
+  fridgeSelected[type]=!fridgeSelected[type];
+  const btn=document.getElementById('fridge-'+type);
+  btn.classList.toggle('active');
+  document.getElementById('fridge-'+type+'-input').style.display=fridgeSelected[type]?'block':'none';
+  if(!fridgeSelected[type]){
+    document.getElementById('t-'+type).value='';
+    document.getElementById('tb-'+type).textContent='';
+    document.getElementById('tb-'+type).className='t-badge';
+    if(type==='cold') state.r2a=null;
+    if(type==='frozen') state.r2b=null;
+  }
+  updateR2();
 }
 
 function tempCheck(input,badgeId,threshold,mode,rid,cid,noteId){
   const val=parseFloat(input.value);
   const badge=document.getElementById(badgeId);
-  if(isNaN(val)){badge.textContent='';badge.className='t-badge';state[rid]=null;render(rid,cid);updateSummary();return;}
+  if(isNaN(val)){badge.textContent='';badge.className='t-badge';return;}
   const ok=(mode==='below')?val<=threshold:val>=threshold;
   badge.textContent=ok?'✓ OK':'⚠ NG';
   badge.className='t-badge '+(ok?'t-ok':'t-ng');
-  state[rid]=ok;
-  render(rid,cid);
-  const note=document.getElementById(noteId);
-  if(note) note.style.display=ok?'none':'block';
+  if(rid==='r2a') state.r2a=ok;
+  if(rid==='r2b') state.r2b=ok;
+  updateR2();
+}
+
+function updateR2(){
+  // ②は冷蔵・冷凍のうち選択された方が全てOKならOK
+  const checks=[];
+  if(fridgeSelected.cold) checks.push(state.r2a);
+  if(fridgeSelected.frozen) checks.push(state.r2b);
+  if(checks.length===0){ state.r2=null; }
+  else if(checks.some(v=>v===undefined||v===null||v===false)){
+    state.r2 = checks.includes(false) ? false : null;
+  } else {
+    state.r2 = true;
+  }
+  const n2=document.getElementById('n2');
+  if(n2) n2.style.display=(state.r2===false)?'block':'none';
   updateSummary();
 }
 
@@ -674,69 +785,74 @@ function updateSummary(){
   else if(done<TOTAL){st.textContent='記録中…';st.style.color='#BA7517';}
   else if(ngCount===0){st.textContent='✓ 全項目OK';st.style.color='#1D9E75';}
   else{st.textContent='NG '+ngCount+'件あり';st.style.color='#E24B4A';}
-  // 途中保存は常に有効（1項目以上記録があれば）
   document.getElementById('draft-btn').disabled=(done===0);
-  // 最終保存は全項目完了時のみ
   document.getElementById('save-btn').disabled=(done<TOTAL);
 }
 
 function f(v){return v===true?'OK':v===false?'NG':'—';}
 
-function saveRecord(){
-  const now=new Date();
-  const dateStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-  const timeStr=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-
-  document.getElementById('f-date').value=dateStr;
-  document.getElementById('f-time').value=timeStr;
-  document.getElementById('f-staff').value=document.getElementById('staff').value||'未選択';
-  document.getElementById('f-facility').value=sessionStorage.getItem('haccp_facility')||'—';
-  document.getElementById('f-mealType').value=selectedMeal||'—';
-  document.getElementById('f-r8').value=f(state.r8);
-  document.getElementById('f-r9').value=f(state.r9);
-  document.getElementById('f-r10').value=f(state.r10);
-  document.getElementById('f-r11').value=f(state.r7);
-  document.getElementById('f-n8').value=document.getElementById('n8')?document.getElementById('n8').value||'':'';
-  document.getElementById('f-n9').value=document.getElementById('n9')?document.getElementById('n9').value||'':'';
-  document.getElementById('f-n10').value=document.getElementById('n10')?document.getElementById('n10').value||'':'';
-  document.getElementById('f-meals').value=document.getElementById('meal-count').value||'—';
-  document.getElementById('f-r1').value=f(state.r1);
-  document.getElementById('f-r2').value=f(state.r2);
-  document.getElementById('f-r3').value=f(state.r3);
-  document.getElementById('f-t1').value=document.getElementById('t1').value||'—';
-  document.getElementById('f-r4').value=f(state.r4);
-  document.getElementById('f-r5').value=f(state.r5);
-  document.getElementById('f-r6').value=f(state.r6);
-  document.getElementById('f-t2').value=document.getElementById('t2').value||'—';
-  document.getElementById('f-r7').value=f(state.r7);
-  document.getElementById('f-n1').value=document.getElementById('n1').value||'';
-  document.getElementById('f-n4').value=document.getElementById('n4').value||'';
-  document.getElementById('f-n6').value=document.getElementById('n6').value||'';
-
-  document.getElementById('gas-form').submit();
-
-  setTimeout(()=>{
-    document.getElementById('saved-time').textContent=timeStr;
-    document.getElementById('saved-msg').style.display='flex';
-    const btn=document.getElementById('save-btn');
-    btn.innerHTML='<i class="ti ti-check"></i> 保存済み';
-    btn.disabled=true;
-  },1500);
+function getWhenVal(num){
+  if(whenSelected[num]==='その他'){
+    const other=document.getElementById('when'+num+'-other').value;
+    return 'その他：'+(other||'未記入');
+  }
+  return whenSelected[num]||'—';
 }
 
+function setFormValues(dateStr, timeStr, status){
+  document.getElementById('f-date').value=dateStr;
+  document.getElementById('f-time').value=timeStr;
+  document.getElementById('f-status').value=status;
+  document.getElementById('f-facility').value=sessionStorage.getItem('haccp_facility')||'—';
+  document.getElementById('f-meals').value=document.getElementById('meal-count').value||'—';
 
+  document.getElementById('f-staff1').value=document.getElementById('cs1').value||'—';
+  document.getElementById('f-when1').value=getWhenVal(1);
+  document.getElementById('f-r1').value=f(state.r1);
+  document.getElementById('f-n1').value=document.getElementById('n1').value||'';
+
+  document.getElementById('f-staff2').value=document.getElementById('cs2').value||'—';
+  document.getElementById('f-when2').value=getWhenVal(2);
+  document.getElementById('f-fridgeCold').value=fridgeSelected.cold?'対象':'—';
+  document.getElementById('f-fridgeFrozen').value=fridgeSelected.frozen?'対象':'—';
+  document.getElementById('f-tCold').value=document.getElementById('t-cold').value||'—';
+  document.getElementById('f-tFrozen').value=document.getElementById('t-frozen').value||'—';
+  document.getElementById('f-r2').value=f(state.r2);
+  document.getElementById('f-n2').value=document.getElementById('n2').value||'';
+
+  document.getElementById('f-staff3').value=document.getElementById('cs3').value||'—';
+  document.getElementById('f-when3').value=getWhenVal(3);
+  document.getElementById('f-r3').value=f(state.r3);
+  document.getElementById('f-n3').value=document.getElementById('n3').value||'';
+
+  document.getElementById('f-staff4').value=document.getElementById('cs4').value||'—';
+  document.getElementById('f-when4').value=getWhenVal(4);
+  document.getElementById('f-r4').value=f(state.r4);
+  document.getElementById('f-n4').value=document.getElementById('n4').value||'';
+
+  document.getElementById('f-staff5').value=document.getElementById('cs5').value||'—';
+  document.getElementById('f-when5').value=getWhenVal(5);
+  document.getElementById('f-r5').value=f(state.r5);
+  document.getElementById('f-n5').value=document.getElementById('n5').value||'';
+
+  document.getElementById('f-staff6').value=document.getElementById('cs6').value||'—';
+  document.getElementById('f-when6').value=getWhenVal(6);
+  document.getElementById('f-r6').value=f(state.r6);
+  document.getElementById('f-n6').value=document.getElementById('n6').value||'';
+
+  document.getElementById('f-staff7').value=document.getElementById('cs7').value||'—';
+  document.getElementById('f-when7').value=getWhenVal(7);
+  document.getElementById('f-r7').value=f(state.r7);
+  document.getElementById('f-n7').value=document.getElementById('n7').value||'';
+}
 
 function saveDraft(){
   const now=new Date();
   const timeStr=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  const dateStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-
-  // 未完了項目をチェック
+  const dateStr=document.getElementById('date-chip').value||todayStr;
   const vals=Object.values(state);
   const done=vals.filter(v=>v!==null).length;
   const incomplete=TOTAL-done;
-
-  // 警告表示
   const warn=document.getElementById('incomplete-warn');
   if(incomplete>0){
     warn.textContent='⚠ 未完了の項目が'+incomplete+'件あります。途中保存として記録します。';
@@ -744,77 +860,89 @@ function saveDraft(){
   } else {
     warn.style.display='none';
   }
-
   setFormValues(dateStr, timeStr, '途中保存');
   document.getElementById('gas-form').submit();
-
   setTimeout(()=>{
     document.getElementById('draft-time').textContent=timeStr;
     document.getElementById('draft-msg').style.display='flex';
   },1500);
 }
 
-function setFormValues(dateStr, timeStr, status){
-  document.getElementById('f-date').value=dateStr;
-  document.getElementById('f-time').value=timeStr;
-  document.getElementById('f-status').value=status;
-  document.getElementById('f-staff').value=document.getElementById('staff').value||'未選択';
-  document.getElementById('f-facility').value=sessionStorage.getItem('haccp_facility')||'—';
-  document.getElementById('f-mealType').value=selectedMeal||'—';
-  document.getElementById('f-staff1').value=document.getElementById('cs1')?document.getElementById('cs1').value||'—':'—';
-  document.getElementById('f-staff2').value=document.getElementById('cs2')?document.getElementById('cs2').value||'—':'—';
-  document.getElementById('f-staff3').value=document.getElementById('cs3')?document.getElementById('cs3').value||'—':'—';
-  document.getElementById('f-staff4').value=document.getElementById('cs4')?document.getElementById('cs4').value||'—':'—';
-  document.getElementById('f-staff5').value=document.getElementById('cs5')?document.getElementById('cs5').value||'—':'—';
-  document.getElementById('f-r1').value=f(state.r1);
-  document.getElementById('f-r2').value=f(state.r2);
-  document.getElementById('f-r3').value=f(state.r3);
-  document.getElementById('f-t1').value=document.getElementById('t1').value||'—';
-  document.getElementById('f-r4').value=f(state.r4);
-  document.getElementById('f-r5').value=f(state.r5);
-  document.getElementById('f-r6').value=f(state.r6);
-  document.getElementById('f-t2').value=document.getElementById('t2').value||'—';
-  document.getElementById('f-r7').value=f(state.r7);
-  document.getElementById('f-r8').value=f(state.r8);
-  document.getElementById('f-r9').value=f(state.r9);
-  document.getElementById('f-r10').value=f(state.r10);
-  document.getElementById('f-r11').value=f(state.r7);
-  document.getElementById('f-n1').value=document.getElementById('n1')?document.getElementById('n1').value||'':'';
-  document.getElementById('f-n4').value=document.getElementById('n4')?document.getElementById('n4').value||'':'';
-  document.getElementById('f-n6').value=document.getElementById('n6')?document.getElementById('n6').value||'':'';
-  document.getElementById('f-n8').value=document.getElementById('n8')?document.getElementById('n8').value||'':'';
-  document.getElementById('f-n9').value=document.getElementById('n9')?document.getElementById('n9').value||'':'';
-  document.getElementById('f-n10').value=document.getElementById('n10')?document.getElementById('n10').value||'':'';
+function saveRecord(){
+  const now=new Date();
+  const dateStr=document.getElementById('date-chip').value||todayStr;
+  const timeStr=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('incomplete-warn').style.display='none';
+  setFormValues(dateStr, timeStr, '完了');
+  document.getElementById('gas-form').submit();
+  setTimeout(()=>{
+    document.getElementById('saved-time').textContent=timeStr;
+    document.getElementById('saved-msg').style.display='flex';
+    const btn=document.getElementById('save-btn');
+    btn.innerHTML='<i class="ti ti-check"></i> 保存済み';
+    btn.disabled=true;
+    document.getElementById('print-btn-wrap').style.display='flex';
+    document.getElementById('print-facility').textContent=sessionStorage.getItem('haccp_facility')||'—';
+    document.getElementById('print-date').textContent=dateStr;
+  },1500);
 }
 
 function printRecord(){
   document.getElementById('print-footer').style.display='block';
   window.print();
 }
+
 function exportCSV(){
-  const now=new Date();
-  const dateStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  const dateStr=document.getElementById('date-chip').value||todayStr;
   const rows=[
-    ['日付','担当者','食数','①数量確認','①外観確認','①受取温度','①受取温度値(℃)','②体調確認','②手洗い','③配膳前温度','③配膳前温度値(℃)','④清掃消毒'],
+    ['記録日','①担当者','①いつ','①結果','②担当者','②いつ','②冷蔵対象','②冷凍対象','②冷蔵温度','②冷凍温度','②結果','③-1担当者','③-1いつ','③-1結果','③-2担当者','③-2いつ','③-2結果','③-3担当者','③-3いつ','③-3結果','④-1担当者','④-1いつ','④-1結果','④-2担当者','④-2いつ','④-2結果'],
     [dateStr,
-      document.getElementById('staff').value||'未選択',
-      document.getElementById('meal-count').value||'—',
-      f(state.r1),f(state.r2),f(state.r3),
-      document.getElementById('t1').value||'—',
-      f(state.r4),f(state.r5),f(state.r6),
-      document.getElementById('t2').value||'—',
-      f(state.r7)
+      document.getElementById('cs1').value||'—', getWhenVal(1), f(state.r1),
+      document.getElementById('cs2').value||'—', getWhenVal(2), fridgeSelected.cold?'対象':'—', fridgeSelected.frozen?'対象':'—', document.getElementById('t-cold').value||'—', document.getElementById('t-frozen').value||'—', f(state.r2),
+      document.getElementById('cs3').value||'—', getWhenVal(3), f(state.r3),
+      document.getElementById('cs4').value||'—', getWhenVal(4), f(state.r4),
+      document.getElementById('cs5').value||'—', getWhenVal(5), f(state.r5),
+      document.getElementById('cs6').value||'—', getWhenVal(6), f(state.r6),
+      document.getElementById('cs7').value||'—', getWhenVal(7), f(state.r7)
     ]
   ];
-  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\\r\\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='HACCP_'+dateStr+'.csv';
+  a.href=url;a.download='衛生管理_'+dateStr+'.csv';
   document.body.appendChild(a);a.click();
   document.body.removeChild(a);URL.revokeObjectURL(url);
 }
+
+// ===== 過去記録の閲覧 =====
+function onDateChange(val){
+  if(val===todayStr){
+    location.reload();
+  } else {
+    loadPastRecord(val);
+  }
+}
+
+function loadPastRecord(dateStr){
+  fetch(GAS_URL+'?action=getbydate&date='+encodeURIComponent(dateStr)+'&t='+Date.now())
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.record){
+        alert(dateStr+' の記録が見つかりました。詳細はダッシュボードでご確認ください。');
+      } else {
+        alert(dateStr+' の記録はありません。');
+        document.getElementById('date-chip').value=todayStr;
+      }
+    })
+    .catch(()=>{
+      alert('読み込みエラーが発生しました。');
+    });
+}
+
+document.getElementById('date-chip').value=todayStr;
+checkSession();
+renderStaffSelect();
 </script>
-</div>
 </body>
 </html>
