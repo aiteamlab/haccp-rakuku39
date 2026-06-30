@@ -234,7 +234,8 @@ async function loadData(){
   document.getElementById('loading').style.display='block';
   document.getElementById('main').style.display='none';
   try{
-    const res=await fetch(GAS_URL+'?t='+Date.now());
+    const facilityName=sessionStorage.getItem('haccp_facility')||'';
+    const res=await fetch(GAS_URL+'?facilityName='+encodeURIComponent(facilityName)+'&t='+Date.now());
     const json=await res.json();
     allData=json.data||[];
     document.getElementById('loading').style.display='none';
