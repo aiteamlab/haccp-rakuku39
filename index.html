@@ -31,6 +31,14 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .date-chip{font-size:13px;color:#555;background:#F1EFE8;padding:6px 14px;border-radius:6px;border:1px solid #E0E0D8;cursor:pointer}
 .dash-link{padding:8px 16px;background:#fff;color:#555;border:1px solid #CCC;border-radius:7px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;text-decoration:none;margin-top:8px}
 .meta-row{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.meal-tabs{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.meal-tab{padding:8px 18px;border:1.5px solid #D0D0C8;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#555;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit}
+.meal-tab.active{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.meal-tab .meal-dot{width:7px;height:7px;border-radius:50%;background:#CCC;flex-shrink:0}
+.meal-tab .meal-dot.done{background:#fff}
+.meal-tab:not(.active) .meal-dot.done{background:#1D9E75}
+.meal-tab:not(.active) .meal-dot.ng{background:#E24B4A}
+.meal-tab .meal-dot.ng{background:#FFD9D9}
 .meta-label{font-size:12px;color:#888;white-space:nowrap}
 .meta-input{border:1px solid #D0D0C8;border-radius:6px;padding:6px 10px;font-size:13px;color:#222;background:#fff;width:90px}
 .btn-staff-mgr{padding:6px 12px;background:#fff;color:#555;border:1px solid #CCC;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px}
@@ -174,6 +182,11 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <a href="dashboard.html" class="dash-link"><i class="ti ti-chart-bar"></i> ダッシュボードへ</a>
         <a href="plan.html" class="dash-link"><i class="ti ti-clipboard-list"></i> 衛生管理計画</a>
       </div>
+    </div>
+    <div class="meal-tabs" id="meal-tabs">
+      <button class="meal-tab active" id="meal-tab-朝食" onclick="selectMealType('朝食')"><span class="meal-dot" id="meal-dot-朝食"></span>朝食</button>
+      <button class="meal-tab" id="meal-tab-昼食" onclick="selectMealType('昼食')"><span class="meal-dot" id="meal-dot-昼食"></span>昼食</button>
+      <button class="meal-tab" id="meal-tab-夕食" onclick="selectMealType('夕食')"><span class="meal-dot" id="meal-dot-夕食"></span>夕食</button>
     </div>
     <div class="meta-row">
       <span class="meta-label">食数</span>
@@ -490,6 +503,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   <input type="hidden" name="time" id="f-time">
   <input type="hidden" name="status" id="f-status">
   <input type="hidden" name="facilityName" id="f-facility">
+  <input type="hidden" name="mealType" id="f-mealType">
   <input type="hidden" name="meals" id="f-meals">
 
   <input type="hidden" name="staff1" id="f-staff1">
@@ -733,6 +747,8 @@ async function loadPlanSettings(){
 }
 const whenFixed={1:'',2:'',3:'',4:'',5:'',6:'',7:''};
 
+let currentMealType='朝食';
+
 const state={r1:null,r2:null,r3:null,r4:null,r5:null,r6:null,r7:null};
 const whenSelected={1:'',2:'',3:'',4:'',5:'',6:'',7:''};
 const fridgeSelected={cold:false,frozen:false};
@@ -861,17 +877,92 @@ function setStateFromResult(rid,cid,resultStr){
   render(rid,cid);
 }
 
+function resetFormState(){
+  // チェック状態のリセット
+  ['r1','r2','r3','r4','r5','r6','r7'].forEach(rid=>{
+    state[rid]=null;
+  });
+  state.r2a=null;state.r2b=null;
+  render('r1','c1');render('r3','c3');render('r4','c4');render('r5','c5');render('r6','c6');render('r7','c7');
+
+  // 担当者プルダウンのリセット
+  ['cs1','cs2','cs3','cs4','cs5','cs6','cs7'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+
+  // 備考欄のリセット
+  ['n1','n2','n3','n4','n5','n6','n7'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.value='';el.style.display='none';}
+  });
+
+  // 冷蔵庫・冷凍庫のリセット
+  if(fridgeSelected.cold) toggleFridge('cold');
+  if(fridgeSelected.frozen) toggleFridge('frozen');
+  document.getElementById('t-cold').value='';
+  document.getElementById('t-frozen').value='';
+  document.getElementById('tb-cold').textContent='';document.getElementById('tb-cold').className='t-badge';
+  document.getElementById('tb-frozen').textContent='';document.getElementById('tb-frozen').className='t-badge';
+
+  // 食数のリセット
+  document.getElementById('meal-count').value='';
+
+  // 保存済み表示のリセット
+  document.getElementById('saved-msg').style.display='none';
+  document.getElementById('draft-msg').style.display='none';
+  document.getElementById('incomplete-warn').style.display='none';
+  document.getElementById('print-btn-wrap').style.display='none';
+  const saveBtn=document.getElementById('save-btn');
+  saveBtn.innerHTML='<i class="ti ti-device-floppy"></i> 記録を保存する';
+
+  updateSummary();
+}
+
+async function selectMealType(mealType){
+  if(mealType===currentMealType) return;
+  currentMealType=mealType;
+  document.querySelectorAll('.meal-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('meal-tab-'+mealType).classList.add('active');
+  resetFormState();
+  await loadTodayRecord();
+}
+
+async function refreshMealDots(){
+  const facilityName=sessionStorage.getItem('haccp_facility');
+  const dateStr=document.getElementById('date-chip').value||todayStr;
+  if(!facilityName) return;
+  try{
+    const res=await fetch(GAS_URL+'?action=getDayStatus&date='+encodeURIComponent(dateStr)+'&facilityName='+encodeURIComponent(facilityName)+'&t='+Date.now());
+    const data=await res.json();
+    const dayStatus=data.dayStatus||{};
+    ['朝食','昼食','夕食'].forEach(mt=>{
+      const dot=document.getElementById('meal-dot-'+mt);
+      if(!dot) return;
+      dot.classList.remove('done','ng');
+      const info=dayStatus[mt];
+      if(info){
+        if(info.hasNG) dot.classList.add('ng');
+        else dot.classList.add('done');
+      }
+    });
+  }catch(err){
+    // サイレントに失敗（ドット表示は補助情報のため）
+  }
+}
+
 async function loadTodayRecord(){
   const facilityName=sessionStorage.getItem('haccp_facility');
   const dateStr=document.getElementById('date-chip').value||todayStr;
   if(!facilityName) return;
   let data;
   try{
-    const res=await fetch(GAS_URL+'?action=getbydate&date='+encodeURIComponent(dateStr)+'&facilityName='+encodeURIComponent(facilityName)+'&t='+Date.now());
+    const res=await fetch(GAS_URL+'?action=getbydate&date='+encodeURIComponent(dateStr)+'&facilityName='+encodeURIComponent(facilityName)+'&mealType='+encodeURIComponent(currentMealType)+'&t='+Date.now());
     data=await res.json();
   }catch(err){
     return;
   }
+  refreshMealDots();
   if(!data||!data.record){
     currentRecordExists=false;
     return;
@@ -910,9 +1001,9 @@ async function loadTodayRecord(){
   if(r['②備考']&&r['②備考']!=='—') document.getElementById('n2').value=r['②備考'];
 
   // ③-1, ③-2, ③-3
-  [['cs3','③-1担当者','r3','c3','③-1備考','n3'],
-   ['cs4','③-2担当者','r4','c4','③-2備考','n4'],
-   ['cs5','③-3担当者','r5','c5','③-3備考','n5']].forEach(([csId,staffKey,rid,cid,noteKey,noteId])=>{
+  [['cs3','③-1担当者'],
+   ['cs4','③-2担当者'],
+   ['cs5','③-3担当者']].forEach(([csId,staffKey])=>{
     const cs=document.getElementById(csId);
     ensureStaffOption(cs,r[staffKey]);
     if(r[staffKey]&&r[staffKey]!=='—') cs.value=r[staffKey];
@@ -940,14 +1031,12 @@ async function loadTodayRecord(){
   updateSummary();
 
   // 復元メッセージとステータス表示
-  const statusEl=document.getElementById('s-status');
   if(r['ステータス']==='完了'){
-    const btn=document.getElementById('save-btn');
     document.getElementById('print-btn-wrap').style.display='flex';
     document.getElementById('print-facility').textContent=facilityName;
     document.getElementById('print-date').textContent=dateStr;
   } else if(r['ステータス']==='途中保存'){
-    document.getElementById('incomplete-warn').textContent='⚠ 本日途中保存された記録を読み込みました。続きから入力できます。';
+    document.getElementById('incomplete-warn').textContent='⚠ 本日途中保存された'+currentMealType+'の記録を読み込みました。続きから入力できます。';
     document.getElementById('incomplete-warn').style.display='block';
   }
 }
@@ -969,6 +1058,7 @@ function setFormValues(dateStr, timeStr, status){
   document.getElementById('f-time').value=timeStr;
   document.getElementById('f-status').value=status;
   document.getElementById('f-facility').value=sessionStorage.getItem('haccp_facility')||'—';
+  document.getElementById('f-mealType').value=currentMealType;
   document.getElementById('f-meals').value=getMealsVal();
 
   document.getElementById('f-staff1').value=document.getElementById('cs1').value||'—';
@@ -1030,6 +1120,7 @@ function saveDraft(){
   setTimeout(()=>{
     document.getElementById('draft-time').textContent=timeStr;
     document.getElementById('draft-msg').style.display='flex';
+    refreshMealDots();
   },1500);
 }
 
@@ -1049,6 +1140,7 @@ function saveRecord(){
     document.getElementById('print-btn-wrap').style.display='flex';
     document.getElementById('print-facility').textContent=sessionStorage.getItem('haccp_facility')||'—';
     document.getElementById('print-date').textContent=dateStr;
+    refreshMealDots();
   },1500);
 }
 
@@ -1060,8 +1152,8 @@ function printRecord(){
 function exportCSV(){
   const dateStr=document.getElementById('date-chip').value||todayStr;
   const rows=[
-    ['記録日','①担当者','①いつ','①結果','②担当者','②いつ','②冷蔵対象','②冷凍対象','②冷蔵温度','②冷凍温度','②結果','③-1担当者','③-1いつ','③-1結果','③-2担当者','③-2いつ','③-2結果','③-3担当者','③-3いつ','③-3結果','④-1担当者','④-1いつ','④-1結果','④-2担当者','④-2いつ','④-2結果'],
-    [dateStr,
+    ['記録日','区分','①担当者','①いつ','①結果','②担当者','②いつ','②冷蔵対象','②冷凍対象','②冷蔵温度','②冷凍温度','②結果','③-1担当者','③-1いつ','③-1結果','③-2担当者','③-2いつ','③-2結果','③-3担当者','③-3いつ','③-3結果','④-1担当者','④-1いつ','④-1結果','④-2担当者','④-2いつ','④-2結果'],
+    [dateStr, currentMealType,
       document.getElementById('cs1').value||'—', getWhenVal(1), f(state.r1),
       document.getElementById('cs2').value||'—', getWhenVal(2), fridgeSelected.cold?'対象':'—', fridgeSelected.frozen?'対象':'—', document.getElementById('t-cold').value||'—', document.getElementById('t-frozen').value||'—', f(state.r2),
       document.getElementById('cs3').value||'—', getWhenVal(3), f(state.r3),
@@ -1075,7 +1167,7 @@ function exportCSV(){
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='衛生管理_'+dateStr+'.csv';
+  a.href=url;a.download='衛生管理_'+dateStr+'_'+currentMealType+'.csv';
   document.body.appendChild(a);a.click();
   document.body.removeChild(a);URL.revokeObjectURL(url);
 }
