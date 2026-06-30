@@ -749,6 +749,140 @@ const whenFixed={1:'',2:'',3:'',4:'',5:'',6:'',7:''};
 
 let currentMealType='朝食';
 
+// 各区分の画面スナップショットをメモリ保持するオブジェクト
+// GASから読み込み済みかどうかも管理する
+const mealSnapshots={
+  '朝食': null,
+  '昼食': null,
+  '夕食': null
+};
+
+// 現在の画面状態をスナップショットとして取得
+function captureSnapshot(){
+  return {
+    meals: document.getElementById('meal-count').value,
+    state: {...state},
+    fridgeCold: fridgeSelected.cold,
+    fridgeFrozen: fridgeSelected.frozen,
+    tCold: document.getElementById('t-cold').value,
+    tFrozen: document.getElementById('t-frozen').value,
+    staff: ['cs1','cs2','cs3','cs4','cs5','cs6','cs7'].map(id=>document.getElementById(id).value),
+    notes: ['n1','n2','n3','n4','n5','n6','n7'].map(id=>document.getElementById(id).value),
+    savedMsg: document.getElementById('saved-msg').style.display,
+    draftMsg: document.getElementById('draft-msg').style.display,
+    incompleteWarn: document.getElementById('incomplete-warn').textContent,
+    incompleteWarnVisible: document.getElementById('incomplete-warn').style.display,
+    printVisible: document.getElementById('print-btn-wrap').style.display,
+    saveBtnHtml: document.getElementById('save-btn').innerHTML,
+    saveBtnDisabled: document.getElementById('save-btn').disabled,
+    gasLoaded: true
+  };
+}
+
+// スナップショットを画面に復元
+function restoreSnapshot(snap){
+  // 食数
+  document.getElementById('meal-count').value=snap.meals||'';
+
+  // チェック状態
+  Object.assign(state, snap.state);
+  render('r1','c1');render('r3','c3');render('r4','c4');render('r5','c5');render('r6','c6');render('r7','c7');
+
+  // 冷蔵庫・冷凍庫
+  if(snap.fridgeCold && !fridgeSelected.cold) toggleFridge('cold');
+  else if(!snap.fridgeCold && fridgeSelected.cold) toggleFridge('cold');
+  if(snap.fridgeFrozen && !fridgeSelected.frozen) toggleFridge('frozen');
+  else if(!snap.fridgeFrozen && fridgeSelected.frozen) toggleFridge('frozen');
+  document.getElementById('t-cold').value=snap.tCold||'';
+  document.getElementById('t-frozen').value=snap.tFrozen||'';
+  // 温度バッジを再計算
+  const tColdEl=document.getElementById('t-cold');
+  if(tColdEl.value) tempCheck(tColdEl,'tb-cold',10,'below','r2a','c2a','n2a');
+  const tFrozenEl=document.getElementById('t-frozen');
+  if(tFrozenEl.value) tempCheck(tFrozenEl,'tb-frozen',-15,'below','r2b','c2b','n2b');
+
+  // 担当者
+  const staffIds=['cs1','cs2','cs3','cs4','cs5','cs6','cs7'];
+  staffIds.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el) el.value=snap.staff[i]||'';
+  });
+
+  // 備考
+  const noteIds=['n1','n2','n3','n4','n5','n6','n7'];
+  noteIds.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el){
+      el.value=snap.notes[i]||'';
+      // NG項目の備考は表示状態も復元
+      const rKey='r'+(i+1);
+      el.style.display=(state[rKey]===false)?'block':'none';
+    }
+  });
+  // n2はupdateR2で制御
+  updateR2();
+
+  // 保存ボタン・メッセージの状態
+  document.getElementById('saved-msg').style.display=snap.savedMsg||'none';
+  document.getElementById('draft-msg').style.display=snap.draftMsg||'none';
+  const warnEl=document.getElementById('incomplete-warn');
+  warnEl.textContent=snap.incompleteWarn||'';
+  warnEl.style.display=snap.incompleteWarnVisible||'none';
+  document.getElementById('print-btn-wrap').style.display=snap.printVisible||'none';
+  const saveBtn=document.getElementById('save-btn');
+  saveBtn.innerHTML=snap.saveBtnHtml||'<i class="ti ti-device-floppy"></i> 記録を保存する';
+  saveBtn.disabled=snap.saveBtnDisabled||false;
+
+  updateSummary();
+}
+
+// 画面を空の初期状態にリセット（スナップショットなし時）
+function resetFormState(){
+  ['r1','r2','r3','r4','r5','r6','r7'].forEach(rid=>{ state[rid]=null; });
+  state.r2a=null;state.r2b=null;
+  render('r1','c1');render('r3','c3');render('r4','c4');render('r5','c5');render('r6','c6');render('r7','c7');
+  ['cs1','cs2','cs3','cs4','cs5','cs6','cs7'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  ['n1','n2','n3','n4','n5','n6','n7'].forEach(id=>{
+    const el=document.getElementById(id); if(el){el.value='';el.style.display='none';}
+  });
+  if(fridgeSelected.cold) toggleFridge('cold');
+  if(fridgeSelected.frozen) toggleFridge('frozen');
+  document.getElementById('t-cold').value='';
+  document.getElementById('t-frozen').value='';
+  document.getElementById('tb-cold').textContent='';document.getElementById('tb-cold').className='t-badge';
+  document.getElementById('tb-frozen').textContent='';document.getElementById('tb-frozen').className='t-badge';
+  document.getElementById('meal-count').value='';
+  document.getElementById('saved-msg').style.display='none';
+  document.getElementById('draft-msg').style.display='none';
+  document.getElementById('incomplete-warn').style.display='none';
+  document.getElementById('print-btn-wrap').style.display='none';
+  const saveBtn=document.getElementById('save-btn');
+  saveBtn.innerHTML='<i class="ti ti-device-floppy"></i> 記録を保存する';
+  updateSummary();
+}
+
+async function selectMealType(mealType){
+  if(mealType===currentMealType) return;
+
+  // 切り替え前の区分のスナップショットを保存
+  mealSnapshots[currentMealType]=captureSnapshot();
+
+  currentMealType=mealType;
+  document.querySelectorAll('.meal-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('meal-tab-'+mealType).classList.add('active');
+
+  const snap=mealSnapshots[mealType];
+  if(snap && snap.gasLoaded){
+    // メモリ上にスナップショットがあれば復元（GAS通信不要）
+    restoreSnapshot(snap);
+  } else {
+    // 初回アクセスはGASから読み込み
+    resetFormState();
+    await loadTodayRecord();
+  }
+}
 const state={r1:null,r2:null,r3:null,r4:null,r5:null,r6:null,r7:null};
 const whenSelected={1:'',2:'',3:'',4:'',5:'',6:'',7:''};
 const fridgeSelected={cold:false,frozen:false};
@@ -1039,6 +1173,9 @@ async function loadTodayRecord(){
     document.getElementById('incomplete-warn').textContent='⚠ 本日途中保存された'+currentMealType+'の記録を読み込みました。続きから入力できます。';
     document.getElementById('incomplete-warn').style.display='block';
   }
+
+  // GAS読み込み完了後のスナップショットを保存
+  mealSnapshots[currentMealType]=captureSnapshot();
 }
 
 function getMealsVal(){
@@ -1121,6 +1258,7 @@ function saveDraft(){
     document.getElementById('draft-time').textContent=timeStr;
     document.getElementById('draft-msg').style.display='flex';
     refreshMealDots();
+    mealSnapshots[currentMealType]=captureSnapshot();
   },1500);
 }
 
@@ -1141,6 +1279,7 @@ function saveRecord(){
     document.getElementById('print-facility').textContent=sessionStorage.getItem('haccp_facility')||'—';
     document.getElementById('print-date').textContent=dateStr;
     refreshMealDots();
+    mealSnapshots[currentMealType]=captureSnapshot();
   },1500);
 }
 
