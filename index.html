@@ -177,7 +177,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     </div>
     <div class="meta-row">
       <span class="meta-label">食数</span>
-      <input class="meta-input" type="number" id="meal-count" placeholder="例：20">
+      <input class="meta-input" type="number" id="meal-count" placeholder="例：20" min="0">
       <span class="meta-label">食</span>
       <button class="btn-staff-mgr" onclick="openStaffMgr()"><i class="ti ti-users"></i> スタッフ管理</button>
     </div>
@@ -840,6 +840,14 @@ function updateSummary(){
 
 function f(v){return v===true?'OK':v===false?'NG':'—';}
 
+function getMealsVal(){
+  const raw=document.getElementById('meal-count').value;
+  if(raw==='') return '—';
+  const num=Number(raw);
+  if(isNaN(num)||num<=0) return '—';
+  return String(num);
+}
+
 function getWhenVal(num){
   return whenFixed[num]||'—';
 }
@@ -849,7 +857,7 @@ function setFormValues(dateStr, timeStr, status){
   document.getElementById('f-time').value=timeStr;
   document.getElementById('f-status').value=status;
   document.getElementById('f-facility').value=sessionStorage.getItem('haccp_facility')||'—';
-  document.getElementById('f-meals').value=document.getElementById('meal-count').value||'—';
+  document.getElementById('f-meals').value=getMealsVal();
 
   document.getElementById('f-staff1').value=document.getElementById('cs1').value||'—';
   document.getElementById('f-when1').value=getWhenVal(1);
