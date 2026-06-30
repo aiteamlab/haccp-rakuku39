@@ -34,14 +34,15 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .card-body{padding:14px 16px}
 .chart-wrap{position:relative;height:220px}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#F8F8F5;color:#888;font-weight:500;font-size:11px;padding:8px 10px;text-align:left;border-bottom:1px solid #E8E8E0}
-td{padding:8px 10px;border-bottom:1px solid #F0F0E8;color:#222}
+th{background:#F8F8F5;color:#888;font-weight:500;font-size:11px;padding:8px 10px;text-align:left;border-bottom:1px solid #E8E8E0;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #F0F0E8;color:#222;white-space:nowrap}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#F8F8F5}
 .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500}
 .badge-ok{background:#E1F5EE;color:#0F6E56}
 .badge-ng{background:#FCEBEB;color:#A32D2D}
 .badge-dash{background:#F1EFE8;color:#888}
+.badge-draft{background:#FAEEDA;color:#BA7517}
 .ng-list{list-style:none}
 .ng-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #F0F0E8;font-size:13px}
 .ng-item:last-child{border-bottom:none}
@@ -63,7 +64,7 @@ tr:hover td{background:#F8F8F5}
 
   <div class="header">
     <div>
-      <div class="brand">らくっく39 × HACCP管理システム ／ ケアホーム春らんまん</div>
+      <div class="brand">らくっく39 × HACCP管理システム ／ <span id="facility-name-header">—</span></div>
       <div class="page-title">管理ダッシュボード</div>
     </div>
     <div class="header-btns">
@@ -129,7 +130,7 @@ tr:hover td{background:#F8F8F5}
       <div class="card">
         <div class="card-head">
           <i class="ti ti-temperature card-icon"></i>
-          <span class="card-title">温度推移（受取時）</span>
+          <span class="card-title">庫内温度推移</span>
         </div>
         <div class="card-body">
           <div class="chart-wrap"><canvas id="temp-chart"></canvas></div>
@@ -158,15 +159,15 @@ tr:hover td{background:#F8F8F5}
           <thead>
             <tr>
               <th>記録日</th>
-              <th>担当者</th>
+              <th>ステータス</th>
               <th>食数</th>
-              <th>①数量</th>
-              <th>①外観</th>
-              <th>①温度</th>
-              <th>②体調</th>
-              <th>②手洗い</th>
-              <th>③温度</th>
-              <th>④清掃</th>
+              <th>①受入</th>
+              <th>②庫内温度</th>
+              <th>③-1交差汚染</th>
+              <th>③-2器具洗浄</th>
+              <th>③-3トイレ</th>
+              <th>④-1健康管理</th>
+              <th>④-2手洗い</th>
             </tr>
           </thead>
           <tbody id="record-tbody"></tbody>
@@ -181,7 +182,6 @@ tr:hover td{background:#F8F8F5}
 
 function fmtDate(v){
   if(!v||v==='—') return '—';
-  // ISO形式 or YYYY-MM-DD どちらも対応
   const s = String(v);
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if(m) return m[1]+'-'+m[2]+'-'+m[3];
@@ -193,6 +193,16 @@ let periodDays=7;
 let ngChart=null;
 let tempChart=null;
 
+const CHECK_DEFS=[
+  {key:'①結果', label:'①受入確認',     note:'①備考'},
+  {key:'②結果', label:'②庫内温度',     note:'②備考'},
+  {key:'③-1結果', label:'③-1交差汚染', note:'③-1備考'},
+  {key:'③-2結果', label:'③-2器具洗浄', note:'③-2備考'},
+  {key:'③-3結果', label:'③-3トイレ',   note:'③-3備考'},
+  {key:'④-1結果', label:'④-1健康管理', note:'④-1備考'},
+  {key:'④-2結果', label:'④-2手洗い',   note:'④-2備考'}
+];
+
 function setPeriod(days,btn){
   periodDays=days;
   document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
@@ -200,7 +210,6 @@ function setPeriod(days,btn){
   const dateRow=document.getElementById('date-range-row');
   if(days===-1){
     dateRow.style.display='flex';
-    // デフォルトで今日と30日前をセット
     const today=new Date();
     const from=new Date();from.setDate(from.getDate()-30);
     document.getElementById('date-to').value=today.toISOString().slice(0,10);
@@ -235,6 +244,7 @@ async function loadData(){
   document.getElementById('main').style.display='none';
   try{
     const facilityName=sessionStorage.getItem('haccp_facility')||'';
+    document.getElementById('facility-name-header').textContent=facilityName||'—';
     const res=await fetch(GAS_URL+'?facilityName='+encodeURIComponent(facilityName)+'&t='+Date.now());
     const json=await res.json();
     allData=json.data||[];
@@ -262,6 +272,23 @@ function badge(v){
   return '<span class="badge badge-dash">—</span>';
 }
 
+function statusBadge(v){
+  if(v==='完了') return '<span class="badge badge-ok">完了</span>';
+  if(v==='途中保存') return '<span class="badge badge-draft">途中保存</span>';
+  return '<span class="badge badge-dash">'+(v||'—')+'</span>';
+}
+
+function hasNG(r){
+  return CHECK_DEFS.some(d=>r[d.key]==='NG');
+}
+
+function staffSummary(r){
+  const names=['①担当者','②担当者','③-1担当者','③-2担当者','③-3担当者','④-1担当者','④-2担当者']
+    .map(k=>r[k]).filter(v=>v&&v!=='—');
+  const uniq=[...new Set(names)];
+  return uniq.join('、');
+}
+
 function renderAll(){
   const data=filterByPeriod(allData);
   renderWithData(data);
@@ -270,31 +297,23 @@ function renderAll(){
 function renderWithData(data){
   const sorted=[...data].sort((a,b)=>String(b['記録日']).localeCompare(String(a['記録日'])));
 
-  // サマリー
   document.getElementById('total-count').textContent=data.length;
-  const ngRows=data.filter(r=>
-    r['①数量確認']==='NG'||r['①外観確認']==='NG'||r['①受取温度']==='NG'||
-    r['②体調確認']==='NG'||r['②手洗い']==='NG'||
-    r['③配膳前温度']==='NG'||r['④清掃消毒']==='NG'
-  );
-  const okRows=data.filter(r=>
-    r['①数量確認']==='OK'&&r['①外観確認']==='OK'&&r['①受取温度']==='OK'&&
-    r['②体調確認']==='OK'&&r['②手洗い']==='OK'&&
-    r['③配膳前温度']==='OK'&&r['④清掃消毒']==='OK'
-  );
+  const ngRows=data.filter(hasNG);
+  const okRows=data.filter(r=>CHECK_DEFS.every(d=>r[d.key]==='OK'));
   const okRate=data.length>0?Math.round(okRows.length/data.length*100):0;
   document.getElementById('ok-rate').textContent=okRate+'%';
   document.getElementById('ok-sub').textContent=okRows.length+'件 / '+data.length+'件';
   document.getElementById('ng-count').textContent=ngRows.length;
   if(sorted.length>0){
     document.getElementById('last-date').textContent=fmtDate(sorted[0]['記録日']);
-    document.getElementById('last-staff').textContent=sorted[0]['担当者']||'';
+    document.getElementById('last-staff').textContent=staffSummary(sorted[0]);
+  } else {
+    document.getElementById('last-date').textContent='—';
+    document.getElementById('last-staff').textContent='';
   }
 
-  // 項目別NGグラフ
-  const ngCols=['①数量確認','①外観確認','①受取温度','②体調確認','②手洗い','③配膳前温度','④清掃消毒'];
-  const ngLabels=['①数量','①外観','①受取温度','②体調','②手洗い','③配膳温度','④清掃'];
-  const ngCounts=ngCols.map(col=>data.filter(r=>r[col]==='NG').length);
+  const ngLabels=CHECK_DEFS.map(d=>d.label);
+  const ngCounts=CHECK_DEFS.map(d=>data.filter(r=>r[d.key]==='NG').length);
 
   if(ngChart) ngChart.destroy();
   const ctx1=document.getElementById('ng-chart').getContext('2d');
@@ -317,14 +336,13 @@ function renderWithData(data){
       plugins:{legend:{display:false}},
       scales:{
         y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'#F0F0E8'}},
-        x:{grid:{display:false}}
+        x:{grid:{display:false},ticks:{font:{size:10}}}
       }
     }
   });
 
-  // 温度推移グラフ
-  const tempData=[...data]
-    .filter(r=>r['①受取温度値(℃)']&&r['①受取温度値(℃)']!=='—')
+  const tempSource=[...data]
+    .filter(r=>(r['②冷蔵温度(℃)']&&r['②冷蔵温度(℃)']!=='—')||(r['②冷凍温度(℃)']&&r['②冷凍温度(℃)']!=='—'))
     .sort((a,b)=>new Date(a['記録日'])-new Date(b['記録日']))
     .slice(-20);
 
@@ -333,81 +351,75 @@ function renderWithData(data){
   tempChart=new Chart(ctx2,{
     type:'line',
     data:{
-      labels:tempData.map(r=>fmtDate(r['記録日'])),
-      datasets:[{
-        label:'受取温度(℃)',
-        data:tempData.map(r=>parseFloat(r['①受取温度値(℃)'])||null),
-        borderColor:'#1D9E75',
-        backgroundColor:'#E1F5EE',
-        borderWidth:2,
-        pointRadius:4,
-        pointBackgroundColor:'#1D9E75',
-        tension:0.3,
-        fill:true
-      }]
+      labels:tempSource.map(r=>fmtDate(r['記録日'])),
+      datasets:[
+        {
+          label:'冷蔵庫(℃)',
+          data:tempSource.map(r=>{
+            const v=r['②冷蔵温度(℃)'];
+            return (v&&v!=='—')?parseFloat(v):null;
+          }),
+          borderColor:'#1D9E75',
+          backgroundColor:'#E1F5EE',
+          borderWidth:2,
+          pointRadius:3,
+          pointBackgroundColor:'#1D9E75',
+          tension:0.3,
+          spanGaps:true
+        },
+        {
+          label:'冷凍庫(℃)',
+          data:tempSource.map(r=>{
+            const v=r['②冷凍温度(℃)'];
+            return (v&&v!=='—')?parseFloat(v):null;
+          }),
+          borderColor:'#3B5BDB',
+          backgroundColor:'#E8ECFB',
+          borderWidth:2,
+          pointRadius:3,
+          pointBackgroundColor:'#3B5BDB',
+          tension:0.3,
+          spanGaps:true
+        }
+      ]
     },
     options:{
       responsive:true,
       maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
+      plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:10,font:{size:11}}}},
       scales:{
         y:{grid:{color:'#F0F0E8'},ticks:{callback:v=>v+'℃'}},
-        x:{grid:{display:false},ticks:{maxTicksLimit:7}}
+        x:{grid:{display:false},ticks:{maxTicksLimit:7,font:{size:10}}}
       }
     }
   });
 
-  // NGリスト
   const ngList=document.getElementById('ng-list');
-  const ngItems=sorted.filter(r=>
-    r['①数量確認']==='NG'||r['①外観確認']==='NG'||r['①受取温度']==='NG'||
-    r['②体調確認']==='NG'||r['②手洗い']==='NG'||
-    r['③配膳前温度']==='NG'||r['④清掃消毒']==='NG'
-  ).slice(0,10);
+  const ngItems=sorted.filter(hasNG).slice(0,10);
 
   if(ngItems.length===0){
     ngList.innerHTML='<div class="empty"><i class="ti ti-circle-check" style="color:#1D9E75;font-size:20px"></i><br>NG記録はありません</div>';
   } else {
     ngList.innerHTML=ngItems.map(r=>{
-      const ngCols2=[];
-      if(r['①数量確認']==='NG') ngCols2.push('①数量確認');
-      if(r['①外観確認']==='NG') ngCols2.push('①外観確認');
-      if(r['①受取温度']==='NG') ngCols2.push('①受取温度');
-      if(r['②体調確認']==='NG') ngCols2.push('②体調確認');
-      if(r['②手洗い']==='NG') ngCols2.push('②手洗い');
-      if(r['③配膳前温度']==='NG') ngCols2.push('③配膳前温度');
-      if(r['④清掃消毒']==='NG') ngCols2.push('④清掃消毒');
-      return `<li class="ng-item">
-        <div class="ng-dot"></div>
-        <div>
-          <span class="ng-date">${fmtDate(r['記録日'])} ${r['担当者']||''}</span><br>
-          NG項目：${ngCols2.join('、')}
-          ${r['NG備考（到着時）']?'<br>備考：'+r['NG備考（到着時）']:''}
-          ${r['NG備考（配膳前）']?'<br>備考：'+r['NG備考（配膳前）']:''}
-        </div>
-      </li>`;
+      const ngLabelsHit=CHECK_DEFS.filter(d=>r[d.key]==='NG');
+      const notes=ngLabelsHit
+        .map(d=>r[d.note])
+        .filter(v=>v&&v!=='—')
+        .map(v=>'備考：'+v);
+      return '<li class="ng-item"><div class="ng-dot"></div><div><span class="ng-date">'+fmtDate(r['記録日'])+' '+staffSummary(r)+'</span><br>NG項目：'+ngLabelsHit.map(d=>d.label).join('、')+(notes.length?'<br>'+notes.join('<br>'):'')+'</div></li>';
     }).join('');
   }
 
-  // 記録一覧テーブル
   const tbody=document.getElementById('record-tbody');
   if(sorted.length===0){
     tbody.innerHTML='<tr><td colspan="10" style="text-align:center;color:#888;padding:20px">記録がありません</td></tr>';
   } else {
-    tbody.innerHTML=sorted.map(r=>`
-      <tr>
-        <td>${fmtDate(r['記録日'])}</td>
-        <td>${r['担当者']||'—'}</td>
-        <td>${r['食数']||'—'}</td>
-        <td>${badge(r['①数量確認'])}</td>
-        <td>${badge(r['①外観確認'])}</td>
-        <td>${badge(r['①受取温度'])} ${r['①受取温度値(℃)']&&r['①受取温度値(℃)']!=='—'?r['①受取温度値(℃)']+'℃':''}</td>
-        <td>${badge(r['②体調確認'])}</td>
-        <td>${badge(r['②手洗い'])}</td>
-        <td>${badge(r['③配膳前温度'])} ${r['③配膳前温度値(℃)']&&r['③配膳前温度値(℃)']!=='—'?r['③配膳前温度値(℃)']+'℃':''}</td>
-        <td>${badge(r['④清掃消毒'])}</td>
-      </tr>
-    `).join('');
+    tbody.innerHTML=sorted.map(r=>{
+      const tempText=[];
+      if(r['②冷蔵温度(℃)']&&r['②冷蔵温度(℃)']!=='—') tempText.push('冷蔵'+r['②冷蔵温度(℃)']+'℃');
+      if(r['②冷凍温度(℃)']&&r['②冷凍温度(℃)']!=='—') tempText.push('冷凍'+r['②冷凍温度(℃)']+'℃');
+      return '<tr><td>'+fmtDate(r['記録日'])+'</td><td>'+statusBadge(r['ステータス'])+'</td><td>'+(r['食数']||'—')+'</td><td>'+badge(r['①結果'])+'</td><td>'+badge(r['②結果'])+(tempText.length?' '+tempText.join('／'):'')+'</td><td>'+badge(r['③-1結果'])+'</td><td>'+badge(r['③-2結果'])+'</td><td>'+badge(r['③-3結果'])+'</td><td>'+badge(r['④-1結果'])+'</td><td>'+badge(r['④-2結果'])+'</td></tr>';
+    }).join('');
   }
 }
 
