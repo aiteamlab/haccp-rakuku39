@@ -578,11 +578,12 @@ function showLoginError(msg){
   el.textContent=msg;el.style.display='block';
 }
 
-function showApp(facilityName){
+async function showApp(facilityName){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('facility-name-header').textContent=facilityName;
-  loadPlanSettings();
+  await loadPlanSettings();
+  await loadTodayRecord();
 }
 
 function checkSession(){
@@ -839,6 +840,117 @@ function updateSummary(){
 }
 
 function f(v){return v===true?'OK':v===false?'NG':'—';}
+
+// ===== 当日記録の復元（再ログイン・途中保存の続きから編集できるようにする） =====
+let currentRecordExists=false;
+
+function ensureStaffOption(selectEl,name){
+  if(!name||name==='—') return;
+  const exists=[...selectEl.options].some(o=>o.value===name);
+  if(!exists){
+    const opt=document.createElement('option');
+    opt.value=name;opt.textContent=name+'（計画外）';
+    selectEl.appendChild(opt);
+  }
+}
+
+function setStateFromResult(rid,cid,resultStr){
+  if(resultStr==='OK') state[rid]=true;
+  else if(resultStr==='NG') state[rid]=false;
+  else state[rid]=null;
+  render(rid,cid);
+}
+
+async function loadTodayRecord(){
+  const facilityName=sessionStorage.getItem('haccp_facility');
+  const dateStr=document.getElementById('date-chip').value||todayStr;
+  if(!facilityName) return;
+  let data;
+  try{
+    const res=await fetch(GAS_URL+'?action=getbydate&date='+encodeURIComponent(dateStr)+'&facilityName='+encodeURIComponent(facilityName)+'&t='+Date.now());
+    data=await res.json();
+  }catch(err){
+    return;
+  }
+  if(!data||!data.record){
+    currentRecordExists=false;
+    return;
+  }
+  currentRecordExists=true;
+  const r=data.record;
+
+  // 食数
+  if(r['食数']&&r['食数']!=='—'){
+    document.getElementById('meal-count').value=r['食数'];
+  }
+
+  // ①
+  const cs1=document.getElementById('cs1');
+  ensureStaffOption(cs1,r['①担当者']);
+  if(r['①担当者']&&r['①担当者']!=='—') cs1.value=r['①担当者'];
+  setStateFromResult('r1','c1',r['①結果']);
+  if(r['①備考']&&r['①備考']!=='—') document.getElementById('n1').value=r['①備考'];
+
+  // ②
+  const cs2=document.getElementById('cs2');
+  ensureStaffOption(cs2,r['②担当者']);
+  if(r['②担当者']&&r['②担当者']!=='—') cs2.value=r['②担当者'];
+  if(r['②冷蔵対象']==='対象' && !fridgeSelected.cold) toggleFridge('cold');
+  if(r['②冷凍対象']==='対象' && !fridgeSelected.frozen) toggleFridge('frozen');
+  if(r['②冷蔵温度(℃)']&&r['②冷蔵温度(℃)']!=='—'){
+    const tCold=document.getElementById('t-cold');
+    tCold.value=r['②冷蔵温度(℃)'];
+    tempCheck(tCold,'tb-cold',10,'below','r2a','c2a','n2a');
+  }
+  if(r['②冷凍温度(℃)']&&r['②冷凍温度(℃)']!=='—'){
+    const tFrozen=document.getElementById('t-frozen');
+    tFrozen.value=r['②冷凍温度(℃)'];
+    tempCheck(tFrozen,'tb-frozen',-15,'below','r2b','c2b','n2b');
+  }
+  if(r['②備考']&&r['②備考']!=='—') document.getElementById('n2').value=r['②備考'];
+
+  // ③-1, ③-2, ③-3
+  [['cs3','③-1担当者','r3','c3','③-1備考','n3'],
+   ['cs4','③-2担当者','r4','c4','③-2備考','n4'],
+   ['cs5','③-3担当者','r5','c5','③-3備考','n5']].forEach(([csId,staffKey,rid,cid,noteKey,noteId])=>{
+    const cs=document.getElementById(csId);
+    ensureStaffOption(cs,r[staffKey]);
+    if(r[staffKey]&&r[staffKey]!=='—') cs.value=r[staffKey];
+  });
+  setStateFromResult('r3','c3',r['③-1結果']);
+  if(r['③-1備考']&&r['③-1備考']!=='—') document.getElementById('n3').value=r['③-1備考'];
+  setStateFromResult('r4','c4',r['③-2結果']);
+  if(r['③-2備考']&&r['③-2備考']!=='—') document.getElementById('n4').value=r['③-2備考'];
+  setStateFromResult('r5','c5',r['③-3結果']);
+  if(r['③-3備考']&&r['③-3備考']!=='—') document.getElementById('n5').value=r['③-3備考'];
+
+  // ④-1, ④-2
+  const cs6=document.getElementById('cs6');
+  ensureStaffOption(cs6,r['④-1担当者']);
+  if(r['④-1担当者']&&r['④-1担当者']!=='—') cs6.value=r['④-1担当者'];
+  setStateFromResult('r6','c6',r['④-1結果']);
+  if(r['④-1備考']&&r['④-1備考']!=='—') document.getElementById('n6').value=r['④-1備考'];
+
+  const cs7=document.getElementById('cs7');
+  ensureStaffOption(cs7,r['④-2担当者']);
+  if(r['④-2担当者']&&r['④-2担当者']!=='—') cs7.value=r['④-2担当者'];
+  setStateFromResult('r7','c7',r['④-2結果']);
+  if(r['④-2備考']&&r['④-2備考']!=='—') document.getElementById('n7').value=r['④-2備考'];
+
+  updateSummary();
+
+  // 復元メッセージとステータス表示
+  const statusEl=document.getElementById('s-status');
+  if(r['ステータス']==='完了'){
+    const btn=document.getElementById('save-btn');
+    document.getElementById('print-btn-wrap').style.display='flex';
+    document.getElementById('print-facility').textContent=facilityName;
+    document.getElementById('print-date').textContent=dateStr;
+  } else if(r['ステータス']==='途中保存'){
+    document.getElementById('incomplete-warn').textContent='⚠ 本日途中保存された記録を読み込みました。続きから入力できます。';
+    document.getElementById('incomplete-warn').style.display='block';
+  }
+}
 
 function getMealsVal(){
   const raw=document.getElementById('meal-count').value;
