@@ -582,8 +582,7 @@ async function showApp(facilityName){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('facility-name-header').textContent=facilityName;
-  await loadPlanSettings();
-  await loadTodayRecord();
+  await Promise.all([loadPlanSettings(), loadTodayRecord()]);
 }
 
 function checkSession(){
@@ -820,7 +819,8 @@ function updateR2(){
 }
 
 function updateSummary(){
-  const vals=Object.values(state);
+  const MAIN_KEYS=['r1','r2','r3','r4','r5','r6','r7'];
+  const vals=MAIN_KEYS.map(k=>state[k]);
   const done=vals.filter(v=>v!==null).length;
   const okCount=vals.filter(v=>v===true).length;
   const ngCount=vals.filter(v=>v===false).length;
@@ -1015,7 +1015,7 @@ function saveDraft(){
   const now=new Date();
   const timeStr=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
   const dateStr=document.getElementById('date-chip').value||todayStr;
-  const vals=Object.values(state);
+  const vals=['r1','r2','r3','r4','r5','r6','r7'].map(k=>state[k]);
   const done=vals.filter(v=>v!==null).length;
   const incomplete=TOTAL-done;
   const warn=document.getElementById('incomplete-warn');
