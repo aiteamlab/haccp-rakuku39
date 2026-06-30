@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>らくっく39 × 社長ダッシュボード</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;background:#F5F5F3;color:#222;min-height:100vh}
+
+.login-bg{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#F5F5F3}
+.login-card{background:#fff;border:1px solid #E0E0D8;border-radius:16px;padding:36px 32px;width:360px;max-width:90vw}
+.login-logo{font-size:11px;color:#888;letter-spacing:.07em;margin-bottom:6px}
+.login-title{font-size:22px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.login-sub{font-size:12px;color:#888;margin-bottom:24px}
+.login-label{font-size:12px;color:#555;margin-bottom:4px;display:block}
+.login-input{width:100%;border:1px solid #D0D0C8;border-radius:7px;padding:10px 12px;font-size:14px;color:#222;margin-bottom:14px;box-sizing:border-box}
+.login-input:focus{outline:none;border-color:#3B5BDB}
+.login-btn{width:100%;padding:12px;background:#3B5BDB;color:#fff;border:none;border-radius:7px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.login-btn:hover:not(:disabled){opacity:.9}
+.login-btn:disabled{background:#CCC;cursor:not-allowed}
+.login-error{font-size:13px;color:#A32D2D;background:#FCEBEB;border:1px solid #F09595;border-radius:6px;padding:8px 12px;margin-top:12px;display:none}
+.login-loading{font-size:13px;color:#888;text-align:center;margin-top:12px;display:none}
+
+.wrap{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
+.header{background:#fff;border:1px solid #E0E0D8;border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.brand{font-size:11px;color:#888;letter-spacing:.07em;margin-bottom:3px}
+.page-title{font-size:20px;font-weight:600;color:#1a1a1a}
+.btn-reload{padding:8px 16px;background:#3B5BDB;color:#fff;border:none;border-radius:7px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-reload:hover{opacity:.9}
+
+.loading{text-align:center;padding:60px;color:#888;font-size:14px}
+
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid #E0E0D8;border-radius:10px;padding:14px 16px}
+.stat-label{font-size:11px;color:#888;margin-bottom:6px}
+.stat-val{font-size:26px;font-weight:600;color:#1a1a1a}
+.stat-val.green{color:#1D9E75}
+.stat-val.red{color:#E24B4A}
+.stat-val.amber{color:#BA7517}
+
+.facility-grid{display:grid;gap:12px}
+.facility-card{background:#fff;border:1px solid #E0E0D8;border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow .15s}
+.facility-card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.08)}
+.facility-head{display:flex;align-items:center;gap:12px;padding:16px 20px}
+.status-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.status-dot.green{background:#1D9E75}
+.status-dot.amber{background:#F59E0B}
+.status-dot.red{background:#E24B4A}
+.status-dot.gray{background:#CCC}
+.facility-info{flex:1}
+.facility-name{font-size:15px;font-weight:600;color:#1a1a1a}
+.facility-meta{font-size:12px;color:#888;margin-top:3px}
+.facility-stats{display:flex;gap:20px;align-items:center}
+.fstat{text-align:center}
+.fstat-val{font-size:18px;font-weight:600}
+.fstat-label{font-size:10px;color:#888;margin-top:2px}
+.status-badge{font-size:11px;padding:4px 12px;border-radius:14px;font-weight:600;white-space:nowrap}
+.badge-green{background:#E1F5EE;color:#0F6E56}
+.badge-amber{background:#FAEEDA;color:#BA7517}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+.badge-gray{background:#F0F0E8;color:#888}
+.facility-disabled{opacity:0.5}
+
+.empty{text-align:center;padding:40px;color:#888;font-size:13px}
+
+@media(max-width:768px){
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .facility-head{flex-wrap:wrap}
+  .facility-stats{width:100%;justify-content:space-between}
+}
+</style>
+</head>
+<body>
+
+<div id="login-screen" class="login-bg">
+  <div class="login-card">
+    <div class="login-logo">らくっく39 × HACCP管理システム</div>
+    <div class="login-title">社長ログイン</div>
+    <div class="login-sub">全施設の運用状況を一覧で確認できます</div>
+    <label class="login-label">ログインID</label>
+    <input class="login-input" type="text" id="login-id" placeholder="ID" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+    <label class="login-label">パスワード</label>
+    <input class="login-input" type="password" id="login-pass" placeholder="パスワード" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" id="login-btn" onclick="doLogin()">ログイン</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-loading" id="login-loading">認証中...</div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+<div class="wrap">
+
+  <div class="header">
+    <div>
+      <div class="brand">らくっく39 × HACCP管理システム</div>
+      <div class="page-title">社長ダッシュボード ／ 全施設の運用状況</div>
+    </div>
+    <button class="btn-reload" onclick="loadData()"><i class="ti ti-refresh"></i> 最新データ取得</button>
+  </div>
+
+  <div id="loading" class="loading"><i class="ti ti-loader"></i> データを読み込み中...</div>
+
+  <div id="main" style="display:none">
+
+    <div class="summary">
+      <div class="stat"><div class="stat-label">運用中の施設数</div><div class="stat-val" id="s-total">0</div></div>
+      <div class="stat"><div class="stat-label">正常稼働</div><div class="stat-val green" id="s-green">0</div></div>
+      <div class="stat"><div class="stat-label">記録滞り注意</div><div class="stat-val amber" id="s-amber">0</div></div>
+      <div class="stat"><div class="stat-label">記録停止・異常</div><div class="stat-val red" id="s-red">0</div></div>
+    </div>
+
+    <div class="facility-grid" id="facility-grid"></div>
+
+  </div>
+</div>
+</div>
+
+<script>
+const GAS_URL='https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec';
+
+function doLogin(){
+  const id=document.getElementById('login-id').value.trim();
+  const pass=document.getElementById('login-pass').value.trim();
+  if(!id||!pass){showLoginError('IDとパスワードを入力してください');return;}
+  document.getElementById('login-btn').disabled=true;
+  document.getElementById('login-error').style.display='none';
+  document.getElementById('login-loading').style.display='block';
+
+  const iframe=document.getElementById('login-iframe');
+  iframe.onload=function(){
+    setTimeout(function(){
+      fetch(GAS_URL+'?action=authresult&t='+Date.now())
+        .then(r=>r.json())
+        .then(data=>{
+          document.getElementById('login-loading').style.display='none';
+          if(data.result==='success'&&data.facilityName==='社長'){
+            sessionStorage.setItem('owner_login','1');
+            showApp();
+          } else {
+            showLoginError('IDまたはパスワードが正しくありません。');
+            document.getElementById('login-btn').disabled=false;
+          }
+        })
+        .catch(()=>{
+          document.getElementById('login-loading').style.display='none';
+          showLoginError('通信エラーが発生しました。再度お試しください。');
+          document.getElementById('login-btn').disabled=false;
+        });
+    },2000);
+  };
+  document.getElementById('f-login-id').value=id;
+  document.getElementById('f-login-pass').value=pass;
+  document.getElementById('f-login-action').value='ownerLogin';
+  document.getElementById('login-form').submit();
+}
+
+function showLoginError(msg){
+  const el=document.getElementById('login-error');
+  el.textContent=msg;el.style.display='block';
+}
+
+function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  loadData();
+}
+
+function checkSession(){
+  if(sessionStorage.getItem('owner_login')==='1') showApp();
+}
+
+async function loadData(){
+  document.getElementById('loading').style.display='block';
+  document.getElementById('main').style.display='none';
+  try{
+    const res=await fetch(GAS_URL+'?action=ownerSummary&t='+Date.now());
+    const json=await res.json();
+    renderFacilities(json.facilities||[]);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('main').style.display='block';
+  }catch(err){
+    document.getElementById('loading').innerHTML='<i class="ti ti-alert-circle"></i> データの取得に失敗しました。再度お試しください。';
+  }
+}
+
+function getStatus(fac){
+  if(fac.status!=='有効') return 'gray';
+  if(!fac.lastRecord) return 'red';
+  const last=new Date(fac.lastRecord+'T00:00:00');
+  const now=new Date();
+  now.setHours(0,0,0,0);
+  const diffDays=Math.floor((now-last)/(1000*60*60*24));
+  if(diffDays<=1) return 'green';
+  if(diffDays<=2) return 'amber';
+  return 'red';
+}
+
+function getStatusLabel(status){
+  if(status==='green') return '正常';
+  if(status==='amber') return '記録滞り注意';
+  if(status==='red') return '要確認';
+  return '停止中';
+}
+
+function renderFacilities(facilities){
+  const grid=document.getElementById('facility-grid');
+  if(facilities.length===0){
+    grid.innerHTML='<div class="empty">登録されている施設がありません</div>';
+    document.getElementById('s-total').textContent='0';
+    document.getElementById('s-green').textContent='0';
+    document.getElementById('s-amber').textContent='0';
+    document.getElementById('s-red').textContent='0';
+    return;
+  }
+
+  let greenCount=0, amberCount=0, redCount=0, activeCount=0;
+
+  const sorted=[...facilities].sort((a,b)=>{
+    const sa=getStatus(a), sb=getStatus(b);
+    const order={red:0,amber:1,gray:2,green:3};
+    return order[sa]-order[sb];
+  });
+
+  grid.innerHTML=sorted.map(fac=>{
+    const status=getStatus(fac);
+    if(fac.status==='有効') activeCount++;
+    if(status==='green') greenCount++;
+    else if(status==='amber') amberCount++;
+    else if(status==='red') redCount++;
+
+    const disabledClass=fac.status!=='有効'?'facility-disabled':'';
+    const badgeClass='badge-'+status;
+    const lastRecordText=fac.lastRecord?fac.lastRecord:'記録なし';
+
+    return `
+      <div class="facility-card ${disabledClass}">
+        <div class="facility-head">
+          <div class="status-dot ${status}"></div>
+          <div class="facility-info">
+            <div class="facility-name">${fac.facilityName}</div>
+            <div class="facility-meta">最新記録：${lastRecordText}　／　総記録件数：${fac.recordCount}件</div>
+          </div>
+          <div class="facility-stats">
+            <div class="fstat">
+              <div class="fstat-val" style="color:${fac.ngCount7days>0?'#E24B4A':'#1D9E75'}">${fac.ngCount7days}</div>
+              <div class="fstat-label">直近7日NG</div>
+            </div>
+            <span class="status-badge ${badgeClass}">${getStatusLabel(status)}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('s-total').textContent=activeCount;
+  document.getElementById('s-green').textContent=greenCount;
+  document.getElementById('s-amber').textContent=amberCount;
+  document.getElementById('s-red').textContent=redCount;
+}
+
+checkSession();
+</script>
+
+<!-- ログイン用隠しフォーム -->
+<iframe name="login-iframe" id="login-iframe" style="display:none"></iframe>
+<form id="login-form" method="POST" action="https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec" target="login-iframe" style="display:none">
+  <input type="hidden" name="action" id="f-login-action" value="ownerLogin">
+  <input type="hidden" name="id" id="f-login-id">
+  <input type="hidden" name="password" id="f-login-pass">
+</form>
+
+</body>
+</html>

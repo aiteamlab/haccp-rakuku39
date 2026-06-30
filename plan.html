@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>らくっく39 × 衛生管理計画</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;background:#F5F5F3;color:#222;min-height:100vh}
+.wrap{max-width:980px;margin:0 auto;padding:24px 20px 60px}
+.header{background:#fff;border:1px solid #E0E0D8;border-radius:12px;padding:16px 20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+.brand{font-size:11px;color:#888;letter-spacing:.07em;margin-bottom:3px}
+.page-title{font-size:20px;font-weight:600;color:#1a1a1a}
+.page-sub{font-size:12px;color:#888;margin-top:6px;line-height:1.6}
+.header-links{display:flex;gap:8px;flex-wrap:wrap}
+.link-btn{padding:8px 16px;background:#fff;color:#555;border:1px solid #CCC;border-radius:7px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;text-decoration:none}
+.link-btn:hover{background:#F5F5F3}
+
+.notice{font-size:12px;color:#633806;background:#FAEEDA;border:1px solid #EF9F27;border-radius:8px;padding:10px 14px;margin-bottom:16px;line-height:1.7}
+
+.card{background:#fff;border:1px solid #E0E0D8;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.card-head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#F8F8F5;border-bottom:1px solid #E8E8E0;flex-wrap:wrap}
+.card-icon{font-size:17px;color:#1D9E75}
+.card-title{font-size:13px;font-weight:600;color:#1a1a1a;flex:1}
+.card-no{font-size:11px;background:#1D9E75;color:#fff;padding:2px 8px;border-radius:10px;font-weight:600}
+.card-body{padding:14px}
+
+.howto-box{background:#F8F8F5;border-radius:6px;padding:8px 10px;font-size:11.5px;color:#666;margin-bottom:12px;line-height:1.6}
+
+.when-label{font-size:12px;color:#555;margin-bottom:8px;font-weight:600}
+.when-opts{display:flex;flex-direction:column;gap:6px}
+.when-opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E0E0D8;border-radius:6px;cursor:pointer;transition:all .15s}
+.when-opt:hover{background:#F8F8F5}
+.when-opt.checked{background:#E1F5EE;border-color:#1D9E75}
+.when-opt-checkbox{width:18px;height:18px;border-radius:4px;border:1.5px solid #CCC;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:transparent;font-size:11px}
+.when-opt.checked .when-opt-checkbox{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.when-opt-label{font-size:13px;color:#222}
+
+.other-input{margin-top:6px;margin-left:26px;border:1px solid #D0D0C8;border-radius:6px;padding:6px 10px;font-size:12px;color:#222;width:calc(100% - 26px);display:none}
+
+.fridge-note{margin-top:10px;padding:10px;background:#E8EDFF;border-radius:6px;font-size:12px;color:#3B5BDB;line-height:1.6}
+
+.btn-row{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:16px;flex-wrap:wrap}
+.saved-msg{display:none;font-size:13px;color:#0F6E56;background:#E1F5EE;padding:8px 16px;border-radius:6px;border:1px solid #9FE1CB;align-items:center;gap:6px}
+.btn-save{padding:12px 32px;background:#1D9E75;color:#fff;border:none;border-radius:7px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-save:hover{opacity:.9}
+
+@media(max-width:640px){
+  .wrap{padding:12px 12px 50px}
+  .page-title{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div>
+      <div class="brand">らくっく39 × 衛生管理計画</div>
+      <div class="page-title">衛生管理計画　設定</div>
+      <div class="page-sub">各項目の「いつ実施するか」を、施設の運用に合わせて設定してください。<br>一度設定すれば、日々の実施記録画面では選択不要になります。</div>
+    </div>
+    <div class="header-links">
+      <a href="index.html" class="link-btn"><i class="ti ti-clipboard-check"></i> 実施記録へ</a>
+      <a href="dashboard.html" class="link-btn"><i class="ti ti-chart-bar"></i> ダッシュボードへ</a>
+    </div>
+  </div>
+
+  <div class="notice">
+    ⚠ この設定は施設全体に適用されます。設定後、「保存する」を押すと実施記録画面に反映されます。
+  </div>
+
+  <!-- ① 原材料の受入確認 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">①</span>
+      <i class="ti ti-truck-delivery card-icon"></i>
+      <span class="card-title">原材料の受入の確認</span>
+    </div>
+    <div class="card-body">
+      <div class="howto-box">📋 どのように：外観、におい、包装の状態、表示（期限、保存方法）を確認する。</div>
+      <div class="when-label">いつ実施しますか？（複数選択可）</div>
+      <div class="when-opts" id="plan1">
+        <div class="when-opt" data-val="納入時" onclick="toggleOpt(this,1)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">納入時</span></div>
+        <div class="when-opt" data-val="その他" onclick="toggleOpt(this,1)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">その他</span></div>
+      </div>
+      <input type="text" class="other-input" id="plan1-other" placeholder="その他の内容を入力">
+    </div>
+  </div>
+
+  <!-- ② 庫内温度の確認 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">②</span>
+      <i class="ti ti-temperature-snow card-icon"></i>
+      <span class="card-title">庫内温度の確認（冷蔵庫・冷凍庫）</span>
+    </div>
+    <div class="card-body">
+      <div class="howto-box">📋 どのように：温度計で庫内温度を確認する。（冷蔵：10℃以下、冷凍：-15℃以下）</div>
+      <div class="when-label">いつ実施しますか？（複数選択可）</div>
+      <div class="when-opts" id="plan2">
+        <div class="when-opt" data-val="始業前" onclick="toggleOpt(this,2)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">始業前</span></div>
+        <div class="when-opt" data-val="作業中" onclick="toggleOpt(this,2)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">作業中</span></div>
+        <div class="when-opt" data-val="業務終了後" onclick="toggleOpt(this,2)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">業務終了後</span></div>
+        <div class="when-opt" data-val="その他" onclick="toggleOpt(this,2)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">その他</span></div>
+      </div>
+      <input type="text" class="other-input" id="plan2-other" placeholder="その他の内容を入力">
+      <div class="fridge-note">💡 冷蔵庫・冷凍庫のどちらを使用しているかは、日々の実施記録画面でその都度選択できます。</div>
+    </div>
+  </div>
+
+  <!-- ③-1 交差汚染・二次汚染の防止 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">③-1</span>
+      <i class="ti ti-shield-check card-icon"></i>
+      <span class="card-title">交差汚染・二次汚染の防止</span>
+    </div>
+    <div class="card-body">
+      <div class="howto-box">📋 どのように：冷蔵庫内の保管状況を確認する。まな板や包丁等の器具類は用途別に使い分け、扱った都度十分洗浄し、消毒する。</div>
+      <div class="when-label">いつ実施しますか？（複数選択可）</div>
+      <div class="when-opts" id="plan3">
+        <div class="when-opt" data-val="始業前" onclick="toggleOpt(this,3)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">始業前</span></div>
+        <div class="when-opt" data-val="作業中" onclick="toggleOpt(this,3)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">作業中</span></div>
+        <div class="when-opt" data-val="業務終了後" onclick="toggleOpt(this,3)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">業務終了後</span></div>
+        <div class="when-opt" data-val="その他" onclick="toggleOpt(this,3)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">その他</span></div>
+      </div>
+      <input type="text" class="other-input" id="plan3-other" placeholder="その他の内容を入力">
+    </div>
+  </div>
+
+  <!-- ③-2 器具等の洗浄・消毒・殺菌 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">③-2</span>
+      <i class="ti ti-tools card-icon"></i>
+      <span class="card-title">器具等の洗浄・消毒・殺菌</span>
+    </div>
+    <div class="card-body">
+      <div class="howto-box">📋 どのように：使用の都度、ざる・ミキサー・ボウル等の器具類を洗浄し、消毒する。</div>
+      <div class="when-label">いつ実施しますか？（複数選択可）</div>
+      <div class="when-opts" id="plan4">
+        <div class="when-opt" data-val="始業前" onclick="toggleOpt(this,4)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">始業前</span></div>
+        <div class="when-opt" data-val="使用後" onclick="toggleOpt(this,4)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">使用後</span></div>
+        <div class="when-opt" data-val="業務終了後" onclick="toggleOpt(this,4)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">業務終了後</span></div>
+        <div class="when-opt" data-val="その他" onclick="toggleOpt(this,4)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">その他</span></div>
+      </div>
+      <input type="text" class="other-input" id="plan4-other" placeholder="その他の内容を入力">
+    </div>
+  </div>
+
+  <!-- ③-3 トイレの洗浄・消毒 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">③-3</span>
+      <i class="ti ti-toilet-paper card-icon"></i>
+      <span class="card-title">トイレの洗浄・消毒</span>
+    </div>
+    <div class="card-body">
+      <div class="howto-box">📋 どのように：トイレの洗浄・消毒を行う。特に便座、水洗レバー、手すり、ドアノブ等は入念に消毒する。</div>
+      <div class="when-label">いつ実施しますか？（複数選択可）</div>
+      <div class="when-opts" id="plan5">
+        <div class="when-opt" data-val="始業前" onclick="toggleOpt(this,5)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">始業前</span></div>
+        <div class="when-opt" data-val="作業中" onclick="toggleOpt(this,5)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">作業中</span></div>
+        <div class="when-opt" data-val="業務終了後" onclick="toggleOpt(this,5)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">業務終了後</span></div>
+        <div class="when-opt" data-val="その他" onclick="toggleOpt(this,5)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">その他</span></div>
+      </div>
+      <input type="text" class="other-input" id="plan5-other" placeholder="その他の内容を入力">
+    </div>
+  </div>
+
+  <!-- ④-1 従業員の健康管理 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">④-1</span>
+      <i class="ti ti-heart-rate-monitor card-icon"></i>
+      <span class="card-title">従業員の健康管理等</span>
+    </div>
+    <div class="card-body">
+      <div class="howto-box">📋 どのように：従業員の体調、手の傷の有無、着衣等の確認を行う。</div>
+      <div class="when-label">いつ実施しますか？（複数選択可）</div>
+      <div class="when-opts" id="plan6">
+        <div class="when-opt" data-val="始業前" onclick="toggleOpt(this,6)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">始業前</span></div>
+        <div class="when-opt" data-val="作業中" onclick="toggleOpt(this,6)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">作業中</span></div>
+        <div class="when-opt" data-val="その他" onclick="toggleOpt(this,6)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">その他</span></div>
+      </div>
+      <input type="text" class="other-input" id="plan6-other" placeholder="その他の内容を入力">
+    </div>
+  </div>
+
+  <!-- ④-2 手洗いの実施 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-no">④-2</span>
+      <i class="ti ti-droplet card-icon"></i>
+      <span class="card-title">手洗いの実施</span>
+    </div>
+    <div class="card-body">
+      <div class="howto-box">📋 どのように：衛生的な手洗いを行う。</div>
+      <div class="when-label">いつ実施しますか？（複数選択可）</div>
+      <div class="when-opts" id="plan7">
+        <div class="when-opt" data-val="トイレの後" onclick="toggleOpt(this,7)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">トイレの後</span></div>
+        <div class="when-opt" data-val="調理施設に入る前" onclick="toggleOpt(this,7)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">調理施設に入る前</span></div>
+        <div class="when-opt" data-val="盛り付けの前" onclick="toggleOpt(this,7)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">盛り付けの前</span></div>
+        <div class="when-opt" data-val="作業内容変更時" onclick="toggleOpt(this,7)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">作業内容変更時</span></div>
+        <div class="when-opt" data-val="生肉や生魚を扱った後" onclick="toggleOpt(this,7)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">生肉や生魚を扱った後</span></div>
+        <div class="when-opt" data-val="金銭をさわった後" onclick="toggleOpt(this,7)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">金銭をさわった後</span></div>
+        <div class="when-opt" data-val="清掃を行った後" onclick="toggleOpt(this,7)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">清掃を行った後</span></div>
+        <div class="when-opt" data-val="その他" onclick="toggleOpt(this,7)"><div class="when-opt-checkbox"><i class="ti ti-check"></i></div><span class="when-opt-label">その他</span></div>
+      </div>
+      <input type="text" class="other-input" id="plan7-other" placeholder="その他の内容を入力">
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <div class="saved-msg" id="saved-msg"><i class="ti ti-circle-check"></i> 保存しました</div>
+    <button class="btn-save" onclick="savePlan()"><i class="ti ti-device-floppy"></i> 設定を保存する</button>
+  </div>
+
+</div>
+
+
+<iframe name="plan-iframe" id="plan-iframe" style="display:none"></iframe>
+<form id="plan-form" method="POST" action="https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec" target="plan-iframe" style="display:none">
+  <input type="hidden" name="action" value="savePlan">
+  <input type="hidden" name="facilityName" id="f-plan-facility">
+  <input type="hidden" name="selected1" id="f-plan-selected1">
+  <input type="hidden" name="other1" id="f-plan-other1">
+  <input type="hidden" name="selected2" id="f-plan-selected2">
+  <input type="hidden" name="other2" id="f-plan-other2">
+  <input type="hidden" name="selected3" id="f-plan-selected3">
+  <input type="hidden" name="other3" id="f-plan-other3">
+  <input type="hidden" name="selected4" id="f-plan-selected4">
+  <input type="hidden" name="other4" id="f-plan-other4">
+  <input type="hidden" name="selected5" id="f-plan-selected5">
+  <input type="hidden" name="other5" id="f-plan-other5">
+  <input type="hidden" name="selected6" id="f-plan-selected6">
+  <input type="hidden" name="other6" id="f-plan-other6">
+  <input type="hidden" name="selected7" id="f-plan-selected7">
+  <input type="hidden" name="other7" id="f-plan-other7">
+</form>
+
+<script>
+const GAS_URL='https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec';
+const planSelected={1:[],2:[],3:[],4:[],5:[],6:[],7:[]};
+
+// ログインチェック
+const facilityName=sessionStorage.getItem('haccp_facility');
+if(!facilityName){
+  alert('ログインが必要です。実施記録画面からログインしてください。');
+  location.href='index.html';
+}
+
+function toggleOpt(el,num){
+  const val=el.getAttribute('data-val');
+  el.classList.toggle('checked');
+  const idx=planSelected[num].indexOf(val);
+  if(idx>=0){
+    planSelected[num].splice(idx,1);
+  } else {
+    planSelected[num].push(val);
+  }
+  const otherInput=document.getElementById('plan'+num+'-other');
+  if(val==='その他'){
+    otherInput.style.display=planSelected[num].includes('その他')?'block':'none';
+  }
+}
+
+function loadPlan(){
+  fetch(GAS_URL+'?action=getPlan&facilityName='+encodeURIComponent(facilityName)+'&t='+Date.now())
+    .then(r=>r.json())
+    .then(data=>{
+      if(!data.plan) return;
+      Object.keys(data.plan).forEach(num=>{
+        const item=data.plan[num];
+        planSelected[num]=item.selected||[];
+        const group=document.getElementById('plan'+num);
+        if(!group) return;
+        group.querySelectorAll('.when-opt').forEach(opt=>{
+          const val=opt.getAttribute('data-val');
+          if(planSelected[num].includes(val)){
+            opt.classList.add('checked');
+          }
+        });
+        if(planSelected[num].includes('その他')){
+          const otherEl=document.getElementById('plan'+num+'-other');
+          if(otherEl){
+            otherEl.style.display='block';
+            otherEl.value=item.other||'';
+          }
+        }
+      });
+    })
+    .catch(()=>{
+      console.log('計画データの取得に失敗しました（初回設定の場合は問題ありません）');
+    });
+}
+
+function savePlan(){
+  const formData=new FormData();
+  formData.append('action','savePlan');
+  formData.append('facilityName',facilityName);
+  [1,2,3,4,5,6,7].forEach(num=>{
+    formData.append('selected'+num, planSelected[num].join(','));
+    const el=document.getElementById('plan'+num+'-other');
+    formData.append('other'+num, el?el.value:'');
+  });
+
+  // hidden iframeでPOST送信（no-cors回避）
+  const iframe=document.getElementById('plan-iframe');
+  document.getElementById('f-plan-facility').value=facilityName;
+  [1,2,3,4,5,6,7].forEach(num=>{
+    document.getElementById('f-plan-selected'+num).value=planSelected[num].join(',');
+    const el=document.getElementById('plan'+num+'-other');
+    document.getElementById('f-plan-other'+num).value=el?el.value:'';
+  });
+  document.getElementById('plan-form').submit();
+
+  setTimeout(()=>{
+    document.getElementById('saved-msg').style.display='flex';
+    setTimeout(()=>{
+      document.getElementById('saved-msg').style.display='none';
+    },3000);
+  },1000);
+}
+
+loadPlan();
+</script>
+</body>
+</html>
