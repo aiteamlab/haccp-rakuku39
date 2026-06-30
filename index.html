@@ -1053,15 +1053,6 @@ function resetFormState(){
   updateSummary();
 }
 
-async function selectMealType(mealType){
-  if(mealType===currentMealType) return;
-  currentMealType=mealType;
-  document.querySelectorAll('.meal-tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById('meal-tab-'+mealType).classList.add('active');
-  resetFormState();
-  await loadTodayRecord();
-}
-
 async function refreshMealDots(){
   const facilityName=sessionStorage.getItem('haccp_facility');
   const dateStr=document.getElementById('date-chip').value||todayStr;
