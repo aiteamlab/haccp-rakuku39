@@ -952,7 +952,7 @@ function onDateChange(val){
 }
 
 function loadPastRecord(dateStr){
-  fetch(GAS_URL+'?action=getbydate&date='+encodeURIComponent(dateStr)+'&t='+Date.now())
+  fetch(GAS_URL+'?action=getbydate&date='+encodeURIComponent(dateStr)+'&facilityName='+encodeURIComponent(sessionStorage.getItem('haccp_facility')||'')+'&t='+Date.now())
     .then(r=>r.json())
     .then(data=>{
       if(data.record){
