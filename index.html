@@ -582,6 +582,7 @@ function showApp(facilityName){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('facility-name-header').textContent=facilityName;
+  loadPlanSettings();
 }
 
 function checkSession(){
@@ -687,24 +688,41 @@ function deleteStaff(i){
 // ===== チェック状態管理 =====
 
 // ===== 衛生管理計画の読み込み・「いつ」固定表示 =====
-function loadPlanSettings(){
-  const saved=localStorage.getItem('haccp_plan');
-  if(!saved){
-    // 計画未設定の場合は通知
+function showPlanUnset(num){
+  const group=document.getElementById('when'+num);
+  if(group) group.innerHTML='<span style="font-size:12px;color:#BA7517">⚠ 未設定（衛生管理計画で設定してください）</span>';
+}
+
+async function loadPlanSettings(){
+  const facilityName=sessionStorage.getItem('haccp_facility');
+  if(!facilityName){
+    for(let num=1;num<=7;num++) showPlanUnset(num);
     return false;
   }
-  const data=JSON.parse(saved);
+  let data;
+  try{
+    const res=await fetch(GAS_URL+'?action=getPlan&facilityName='+encodeURIComponent(facilityName)+'&t='+Date.now());
+    data=await res.json();
+  }catch(err){
+    for(let num=1;num<=7;num++) showPlanUnset(num);
+    return false;
+  }
+  if(!data||!data.plan){
+    for(let num=1;num<=7;num++) showPlanUnset(num);
+    return false;
+  }
   for(let num=1;num<=7;num++){
-    const selected=data.selected[num]||[];
-    const others=data.others||{};
+    const entry=data.plan[num];
+    const selected=(entry&&entry.selected)||[];
+    const other=(entry&&entry.other)||'';
     const group=document.getElementById('when'+num);
     if(!group) continue;
     if(selected.length===0){
-      group.innerHTML='<span style="font-size:12px;color:#BA7517">⚠ 未設定（衛生管理計画で設定してください）</span>';
+      showPlanUnset(num);
       continue;
     }
     const labels=selected.map(v=>{
-      if(v==='その他') return others[num]?('その他：'+others[num]):'その他';
+      if(v==='その他') return other?('その他：'+other):'その他';
       return v;
     });
     group.innerHTML=labels.map(l=>'<span style="display:inline-block;padding:4px 10px;background:#E1F5EE;color:#0F6E56;border-radius:14px;font-size:11.5px;font-weight:600;margin-right:4px">'+l+'</span>').join('');
@@ -970,7 +988,6 @@ function loadPastRecord(dateStr){
 document.getElementById('date-chip').value=todayStr;
 checkSession();
 renderStaffSelect();
-loadPlanSettings();
 </script>
 </body>
 </html>
