@@ -749,94 +749,14 @@ const whenFixed={1:'',2:'',3:'',4:'',5:'',6:'',7:''};
 
 let currentMealType='朝食';
 
-// 各区分の画面スナップショットをメモリ保持するオブジェクト
-// GASから読み込み済みかどうかも管理する
-const mealSnapshots={
+// GASから読み込んだ記録をキャッシュ（途中保存・完了済みのみ）
+const gasRecordCache={
   '朝食': null,
   '昼食': null,
   '夕食': null
 };
 
-// 現在の画面状態をスナップショットとして取得
-function captureSnapshot(){
-  return {
-    meals: document.getElementById('meal-count').value,
-    state: {...state},
-    fridgeCold: fridgeSelected.cold,
-    fridgeFrozen: fridgeSelected.frozen,
-    tCold: document.getElementById('t-cold').value,
-    tFrozen: document.getElementById('t-frozen').value,
-    staff: ['cs1','cs2','cs3','cs4','cs5','cs6','cs7'].map(id=>document.getElementById(id).value),
-    notes: ['n1','n2','n3','n4','n5','n6','n7'].map(id=>document.getElementById(id).value),
-    savedMsg: document.getElementById('saved-msg').style.display,
-    draftMsg: document.getElementById('draft-msg').style.display,
-    incompleteWarn: document.getElementById('incomplete-warn').textContent,
-    incompleteWarnVisible: document.getElementById('incomplete-warn').style.display,
-    printVisible: document.getElementById('print-btn-wrap').style.display,
-    saveBtnHtml: document.getElementById('save-btn').innerHTML,
-    saveBtnDisabled: document.getElementById('save-btn').disabled,
-    gasLoaded: true
-  };
-}
-
-// スナップショットを画面に復元
-function restoreSnapshot(snap){
-  // 食数
-  document.getElementById('meal-count').value=snap.meals||'';
-
-  // チェック状態
-  Object.assign(state, snap.state);
-  render('r1','c1');render('r3','c3');render('r4','c4');render('r5','c5');render('r6','c6');render('r7','c7');
-
-  // 冷蔵庫・冷凍庫
-  if(snap.fridgeCold && !fridgeSelected.cold) toggleFridge('cold');
-  else if(!snap.fridgeCold && fridgeSelected.cold) toggleFridge('cold');
-  if(snap.fridgeFrozen && !fridgeSelected.frozen) toggleFridge('frozen');
-  else if(!snap.fridgeFrozen && fridgeSelected.frozen) toggleFridge('frozen');
-  document.getElementById('t-cold').value=snap.tCold||'';
-  document.getElementById('t-frozen').value=snap.tFrozen||'';
-  // 温度バッジを再計算
-  const tColdEl=document.getElementById('t-cold');
-  if(tColdEl.value) tempCheck(tColdEl,'tb-cold',10,'below','r2a','c2a','n2a');
-  const tFrozenEl=document.getElementById('t-frozen');
-  if(tFrozenEl.value) tempCheck(tFrozenEl,'tb-frozen',-15,'below','r2b','c2b','n2b');
-
-  // 担当者
-  const staffIds=['cs1','cs2','cs3','cs4','cs5','cs6','cs7'];
-  staffIds.forEach((id,i)=>{
-    const el=document.getElementById(id);
-    if(el) el.value=snap.staff[i]||'';
-  });
-
-  // 備考
-  const noteIds=['n1','n2','n3','n4','n5','n6','n7'];
-  noteIds.forEach((id,i)=>{
-    const el=document.getElementById(id);
-    if(el){
-      el.value=snap.notes[i]||'';
-      // NG項目の備考は表示状態も復元
-      const rKey='r'+(i+1);
-      el.style.display=(state[rKey]===false)?'block':'none';
-    }
-  });
-  // n2はupdateR2で制御
-  updateR2();
-
-  // 保存ボタン・メッセージの状態
-  document.getElementById('saved-msg').style.display=snap.savedMsg||'none';
-  document.getElementById('draft-msg').style.display=snap.draftMsg||'none';
-  const warnEl=document.getElementById('incomplete-warn');
-  warnEl.textContent=snap.incompleteWarn||'';
-  warnEl.style.display=snap.incompleteWarnVisible||'none';
-  document.getElementById('print-btn-wrap').style.display=snap.printVisible||'none';
-  const saveBtn=document.getElementById('save-btn');
-  saveBtn.innerHTML=snap.saveBtnHtml||'<i class="ti ti-device-floppy"></i> 記録を保存する';
-  saveBtn.disabled=snap.saveBtnDisabled||false;
-
-  updateSummary();
-}
-
-// 画面を空の初期状態にリセット（スナップショットなし時）
+// 画面を空の初期状態にリセット
 function resetFormState(){
   ['r1','r2','r3','r4','r5','r6','r7'].forEach(rid=>{ state[rid]=null; });
   state.r2a=null;state.r2b=null;
@@ -865,24 +785,18 @@ function resetFormState(){
 
 async function selectMealType(mealType){
   if(mealType===currentMealType) return;
-
-  // 切り替え前の区分のスナップショットを保存
-  mealSnapshots[currentMealType]=captureSnapshot();
-
   currentMealType=mealType;
   document.querySelectorAll('.meal-tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('meal-tab-'+mealType).classList.add('active');
-
-  const snap=mealSnapshots[mealType];
-  if(snap && snap.gasLoaded){
-    // メモリ上にスナップショットがあれば復元（GAS通信不要）
-    restoreSnapshot(snap);
+  resetFormState();
+  // キャッシュがあれば通信せず即時復元、なければGASから読み込み
+  if(gasRecordCache[mealType]){
+    restoreRecord(gasRecordCache[mealType]);
   } else {
-    // 初回アクセスはGASから読み込み
-    resetFormState();
     await loadTodayRecord();
   }
 }
+
 const state={r1:null,r2:null,r3:null,r4:null,r5:null,r6:null,r7:null};
 const whenSelected={1:'',2:'',3:'',4:'',5:'',6:'',7:''};
 const fridgeSelected={cold:false,frozen:false};
@@ -1076,6 +990,72 @@ async function refreshMealDots(){
   }
 }
 
+// GASレコードオブジェクトrを画面に反映する（キャッシュ復元・初回読み込み共通）
+function restoreRecord(r){
+  const facilityName=sessionStorage.getItem('haccp_facility')||'';
+  const dateStr=document.getElementById('date-chip').value||todayStr;
+
+  if(r['食数']&&r['食数']!=='—') document.getElementById('meal-count').value=r['食数'];
+
+  const cs1=document.getElementById('cs1');
+  ensureStaffOption(cs1,r['①担当者']);
+  if(r['①担当者']&&r['①担当者']!=='—') cs1.value=r['①担当者'];
+  setStateFromResult('r1','c1',r['①結果']);
+  if(r['①備考']&&r['①備考']!=='—') document.getElementById('n1').value=r['①備考'];
+
+  const cs2=document.getElementById('cs2');
+  ensureStaffOption(cs2,r['②担当者']);
+  if(r['②担当者']&&r['②担当者']!=='—') cs2.value=r['②担当者'];
+  if(r['②冷蔵対象']==='対象' && !fridgeSelected.cold) toggleFridge('cold');
+  if(r['②冷凍対象']==='対象' && !fridgeSelected.frozen) toggleFridge('frozen');
+  if(r['②冷蔵温度(℃)']&&r['②冷蔵温度(℃)']!=='—'){
+    const tCold=document.getElementById('t-cold');
+    tCold.value=r['②冷蔵温度(℃)'];
+    tempCheck(tCold,'tb-cold',10,'below','r2a','c2a','n2a');
+  }
+  if(r['②冷凍温度(℃)']&&r['②冷凍温度(℃)']!=='—'){
+    const tFrozen=document.getElementById('t-frozen');
+    tFrozen.value=r['②冷凍温度(℃)'];
+    tempCheck(tFrozen,'tb-frozen',-15,'below','r2b','c2b','n2b');
+  }
+  if(r['②備考']&&r['②備考']!=='—') document.getElementById('n2').value=r['②備考'];
+
+  [['cs3','③-1担当者'],['cs4','③-2担当者'],['cs5','③-3担当者']].forEach(([csId,staffKey])=>{
+    const cs=document.getElementById(csId);
+    ensureStaffOption(cs,r[staffKey]);
+    if(r[staffKey]&&r[staffKey]!=='—') cs.value=r[staffKey];
+  });
+  setStateFromResult('r3','c3',r['③-1結果']);
+  if(r['③-1備考']&&r['③-1備考']!=='—') document.getElementById('n3').value=r['③-1備考'];
+  setStateFromResult('r4','c4',r['③-2結果']);
+  if(r['③-2備考']&&r['③-2備考']!=='—') document.getElementById('n4').value=r['③-2備考'];
+  setStateFromResult('r5','c5',r['③-3結果']);
+  if(r['③-3備考']&&r['③-3備考']!=='—') document.getElementById('n5').value=r['③-3備考'];
+
+  const cs6=document.getElementById('cs6');
+  ensureStaffOption(cs6,r['④-1担当者']);
+  if(r['④-1担当者']&&r['④-1担当者']!=='—') cs6.value=r['④-1担当者'];
+  setStateFromResult('r6','c6',r['④-1結果']);
+  if(r['④-1備考']&&r['④-1備考']!=='—') document.getElementById('n6').value=r['④-1備考'];
+
+  const cs7=document.getElementById('cs7');
+  ensureStaffOption(cs7,r['④-2担当者']);
+  if(r['④-2担当者']&&r['④-2担当者']!=='—') cs7.value=r['④-2担当者'];
+  setStateFromResult('r7','c7',r['④-2結果']);
+  if(r['④-2備考']&&r['④-2備考']!=='—') document.getElementById('n7').value=r['④-2備考'];
+
+  updateSummary();
+
+  if(r['ステータス']==='完了'){
+    document.getElementById('print-btn-wrap').style.display='flex';
+    document.getElementById('print-facility').textContent=facilityName;
+    document.getElementById('print-date').textContent=dateStr;
+  } else if(r['ステータス']==='途中保存'){
+    document.getElementById('incomplete-warn').textContent='⚠ 本日途中保存された'+currentMealType+'の記録を読み込みました。続きから入力できます。';
+    document.getElementById('incomplete-warn').style.display='block';
+  }
+}
+
 async function loadTodayRecord(){
   const facilityName=sessionStorage.getItem('haccp_facility');
   const dateStr=document.getElementById('date-chip').value||todayStr;
@@ -1094,79 +1074,9 @@ async function loadTodayRecord(){
   }
   currentRecordExists=true;
   const r=data.record;
-
-  // 食数
-  if(r['食数']&&r['食数']!=='—'){
-    document.getElementById('meal-count').value=r['食数'];
-  }
-
-  // ①
-  const cs1=document.getElementById('cs1');
-  ensureStaffOption(cs1,r['①担当者']);
-  if(r['①担当者']&&r['①担当者']!=='—') cs1.value=r['①担当者'];
-  setStateFromResult('r1','c1',r['①結果']);
-  if(r['①備考']&&r['①備考']!=='—') document.getElementById('n1').value=r['①備考'];
-
-  // ②
-  const cs2=document.getElementById('cs2');
-  ensureStaffOption(cs2,r['②担当者']);
-  if(r['②担当者']&&r['②担当者']!=='—') cs2.value=r['②担当者'];
-  if(r['②冷蔵対象']==='対象' && !fridgeSelected.cold) toggleFridge('cold');
-  if(r['②冷凍対象']==='対象' && !fridgeSelected.frozen) toggleFridge('frozen');
-  if(r['②冷蔵温度(℃)']&&r['②冷蔵温度(℃)']!=='—'){
-    const tCold=document.getElementById('t-cold');
-    tCold.value=r['②冷蔵温度(℃)'];
-    tempCheck(tCold,'tb-cold',10,'below','r2a','c2a','n2a');
-  }
-  if(r['②冷凍温度(℃)']&&r['②冷凍温度(℃)']!=='—'){
-    const tFrozen=document.getElementById('t-frozen');
-    tFrozen.value=r['②冷凍温度(℃)'];
-    tempCheck(tFrozen,'tb-frozen',-15,'below','r2b','c2b','n2b');
-  }
-  if(r['②備考']&&r['②備考']!=='—') document.getElementById('n2').value=r['②備考'];
-
-  // ③-1, ③-2, ③-3
-  [['cs3','③-1担当者'],
-   ['cs4','③-2担当者'],
-   ['cs5','③-3担当者']].forEach(([csId,staffKey])=>{
-    const cs=document.getElementById(csId);
-    ensureStaffOption(cs,r[staffKey]);
-    if(r[staffKey]&&r[staffKey]!=='—') cs.value=r[staffKey];
-  });
-  setStateFromResult('r3','c3',r['③-1結果']);
-  if(r['③-1備考']&&r['③-1備考']!=='—') document.getElementById('n3').value=r['③-1備考'];
-  setStateFromResult('r4','c4',r['③-2結果']);
-  if(r['③-2備考']&&r['③-2備考']!=='—') document.getElementById('n4').value=r['③-2備考'];
-  setStateFromResult('r5','c5',r['③-3結果']);
-  if(r['③-3備考']&&r['③-3備考']!=='—') document.getElementById('n5').value=r['③-3備考'];
-
-  // ④-1, ④-2
-  const cs6=document.getElementById('cs6');
-  ensureStaffOption(cs6,r['④-1担当者']);
-  if(r['④-1担当者']&&r['④-1担当者']!=='—') cs6.value=r['④-1担当者'];
-  setStateFromResult('r6','c6',r['④-1結果']);
-  if(r['④-1備考']&&r['④-1備考']!=='—') document.getElementById('n6').value=r['④-1備考'];
-
-  const cs7=document.getElementById('cs7');
-  ensureStaffOption(cs7,r['④-2担当者']);
-  if(r['④-2担当者']&&r['④-2担当者']!=='—') cs7.value=r['④-2担当者'];
-  setStateFromResult('r7','c7',r['④-2結果']);
-  if(r['④-2備考']&&r['④-2備考']!=='—') document.getElementById('n7').value=r['④-2備考'];
-
-  updateSummary();
-
-  // 復元メッセージとステータス表示
-  if(r['ステータス']==='完了'){
-    document.getElementById('print-btn-wrap').style.display='flex';
-    document.getElementById('print-facility').textContent=facilityName;
-    document.getElementById('print-date').textContent=dateStr;
-  } else if(r['ステータス']==='途中保存'){
-    document.getElementById('incomplete-warn').textContent='⚠ 本日途中保存された'+currentMealType+'の記録を読み込みました。続きから入力できます。';
-    document.getElementById('incomplete-warn').style.display='block';
-  }
-
-  // GAS読み込み完了後のスナップショットを保存
-  mealSnapshots[currentMealType]=captureSnapshot();
+  // GASから取得したレコードをキャッシュに保存（保存済みのみ）
+  gasRecordCache[currentMealType]=r;
+  restoreRecord(r);
 }
 
 function getMealsVal(){
@@ -1249,7 +1159,8 @@ function saveDraft(){
     document.getElementById('draft-time').textContent=timeStr;
     document.getElementById('draft-msg').style.display='flex';
     refreshMealDots();
-    mealSnapshots[currentMealType]=captureSnapshot();
+    // キャッシュを無効化して次回タブ切り替え時にGASから再読み込みさせる
+    gasRecordCache[currentMealType]=null;
   },1500);
 }
 
@@ -1270,7 +1181,8 @@ function saveRecord(){
     document.getElementById('print-facility').textContent=sessionStorage.getItem('haccp_facility')||'—';
     document.getElementById('print-date').textContent=dateStr;
     refreshMealDots();
-    mealSnapshots[currentMealType]=captureSnapshot();
+    // キャッシュを無効化して次回タブ切り替え時にGASから再読み込みさせる
+    gasRecordCache[currentMealType]=null;
   },1500);
 }
 
