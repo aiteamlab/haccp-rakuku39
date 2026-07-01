@@ -549,6 +549,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   <input type="hidden" name="when1" id="f-when1">
   <input type="hidden" name="r1" id="f-r1">
   <input type="hidden" name="n1" id="f-n1">
+  <input type="hidden" name="t1" id="f-t1">
 
   <input type="hidden" name="staff2" id="f-staff2">
   <input type="hidden" name="when2" id="f-when2">
@@ -563,26 +564,31 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   <input type="hidden" name="when3" id="f-when3">
   <input type="hidden" name="r3" id="f-r3">
   <input type="hidden" name="n3" id="f-n3">
+  <input type="hidden" name="t3" id="f-t3">
 
   <input type="hidden" name="staff4" id="f-staff4">
   <input type="hidden" name="when4" id="f-when4">
   <input type="hidden" name="r4" id="f-r4">
   <input type="hidden" name="n4" id="f-n4">
+  <input type="hidden" name="t4" id="f-t4">
 
   <input type="hidden" name="staff5" id="f-staff5">
   <input type="hidden" name="when5" id="f-when5">
   <input type="hidden" name="r5" id="f-r5">
   <input type="hidden" name="n5" id="f-n5">
+  <input type="hidden" name="t5" id="f-t5">
 
   <input type="hidden" name="staff6" id="f-staff6">
   <input type="hidden" name="when6" id="f-when6">
   <input type="hidden" name="r6" id="f-r6">
   <input type="hidden" name="n6" id="f-n6">
+  <input type="hidden" name="t6" id="f-t6">
 
   <input type="hidden" name="staff7" id="f-staff7">
   <input type="hidden" name="when7" id="f-when7">
   <input type="hidden" name="r7" id="f-r7">
   <input type="hidden" name="n7" id="f-n7">
+  <input type="hidden" name="t7" id="f-t7">
 </form>
 
 <script>
@@ -1105,6 +1111,7 @@ function restoreRecord(r){
   if(r['①担当者']&&r['①担当者']!=='—') cs1.value=r['①担当者'];
   setStateFromResult('r1',null,r['①結果']);
   if(r['①備考']&&r['①備考']!=='—') restoreNoteVal(1,r['①備考']);
+  if(r['①確認時刻']&&r['①確認時刻']!=='—') checkTimes[1]=String(r['①確認時刻']);
 
   const cs2=document.getElementById('cs2');
   ensureStaffOption(cs2,r['②担当者']);
@@ -1130,24 +1137,31 @@ function restoreRecord(r){
   });
   setStateFromResult('r3',null,r['③-1結果']);
   if(r['③-1備考']&&r['③-1備考']!=='—') restoreNoteVal(3,r['③-1備考']);
+  if(r['③-1確認時刻']&&r['③-1確認時刻']!=='—') checkTimes[3]=String(r['③-1確認時刻']);
   setStateFromResult('r4',null,r['③-2結果']);
   if(r['③-2備考']&&r['③-2備考']!=='—') restoreNoteVal(4,r['③-2備考']);
+  if(r['③-2確認時刻']&&r['③-2確認時刻']!=='—') checkTimes[4]=String(r['③-2確認時刻']);
   setStateFromResult('r5',null,r['③-3結果']);
   if(r['③-3備考']&&r['③-3備考']!=='—') restoreNoteVal(5,r['③-3備考']);
+  if(r['③-3確認時刻']&&r['③-3確認時刻']!=='—') checkTimes[5]=String(r['③-3確認時刻']);
 
   const cs6=document.getElementById('cs6');
   ensureStaffOption(cs6,r['④-1担当者']);
   if(r['④-1担当者']&&r['④-1担当者']!=='—') cs6.value=r['④-1担当者'];
   setStateFromResult('r6',null,r['④-1結果']);
   if(r['④-1備考']&&r['④-1備考']!=='—') restoreNoteVal(6,r['④-1備考']);
+  if(r['④-1確認時刻']&&r['④-1確認時刻']!=='—') checkTimes[6]=String(r['④-1確認時刻']);
 
   const cs7=document.getElementById('cs7');
   ensureStaffOption(cs7,r['④-2担当者']);
   if(r['④-2担当者']&&r['④-2担当者']!=='—') cs7.value=r['④-2担当者'];
   setStateFromResult('r7',null,r['④-2結果']);
   if(r['④-2備考']&&r['④-2備考']!=='—') restoreNoteVal(7,r['④-2備考']);
+  if(r['④-2確認時刻']&&r['④-2確認時刻']!=='—') checkTimes[7]=String(r['④-2確認時刻']);
 
   updateSummary();
+  // checkTimesが復元されたので、renderBtnsで時刻表示を更新
+  ['r1','r3','r4','r5','r6','r7'].forEach(rid=>renderBtns(rid));
 
   if(r['ステータス']==='完了'){
     document.getElementById('print-btn-wrap').style.display='flex';
@@ -1235,6 +1249,7 @@ function setFormValues(dateStr, timeStr, status){
   document.getElementById('f-when1').value=getWhenVal(1);
   document.getElementById('f-r1').value=f(state.r1);
   document.getElementById('f-n1').value=getNoteVal(1);
+  document.getElementById('f-t1').value=checkTimes[1]||'—';
 
   document.getElementById('f-staff2').value=document.getElementById('cs2').value||'—';
   document.getElementById('f-when2').value=getWhenVal(2);
@@ -1249,26 +1264,31 @@ function setFormValues(dateStr, timeStr, status){
   document.getElementById('f-when3').value=getWhenVal(3);
   document.getElementById('f-r3').value=f(state.r3);
   document.getElementById('f-n3').value=getNoteVal(3);
+  document.getElementById('f-t3').value=checkTimes[3]||'—';
 
   document.getElementById('f-staff4').value=document.getElementById('cs4').value||'—';
   document.getElementById('f-when4').value=getWhenVal(4);
   document.getElementById('f-r4').value=f(state.r4);
   document.getElementById('f-n4').value=getNoteVal(4);
+  document.getElementById('f-t4').value=checkTimes[4]||'—';
 
   document.getElementById('f-staff5').value=document.getElementById('cs5').value||'—';
   document.getElementById('f-when5').value=getWhenVal(5);
   document.getElementById('f-r5').value=f(state.r5);
   document.getElementById('f-n5').value=getNoteVal(5);
+  document.getElementById('f-t5').value=checkTimes[5]||'—';
 
   document.getElementById('f-staff6').value=document.getElementById('cs6').value||'—';
   document.getElementById('f-when6').value=getWhenVal(6);
   document.getElementById('f-r6').value=f(state.r6);
   document.getElementById('f-n6').value=getNoteVal(6);
+  document.getElementById('f-t6').value=checkTimes[6]||'—';
 
   document.getElementById('f-staff7').value=document.getElementById('cs7').value||'—';
   document.getElementById('f-when7').value=getWhenVal(7);
   document.getElementById('f-r7').value=f(state.r7);
   document.getElementById('f-n7').value=getNoteVal(7);
+  document.getElementById('f-t7').value=checkTimes[7]||'—';
 }
 
 function saveDraft(){
