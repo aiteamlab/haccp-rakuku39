@@ -92,6 +92,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .check-time.visible{display:block}
 .ng-label{font-size:11px;color:#888;margin-top:8px;margin-bottom:2px;font-weight:600;display:none}
 .ng-label.visible{display:block}
+.verify-area{display:none;margin-top:10px;padding:10px 12px;background:#FFF3CD;border:1px solid #FFCA2C;border-radius:8px}
+.verify-area.visible{display:block}
+.verify-label{font-size:11px;color:#856404;font-weight:600;margin-bottom:6px}
+.verify-select{width:100%;border:1px solid #FFCA2C;border-radius:6px;padding:7px 10px;font-size:13px;color:#222;background:#fff}
+.verify-time{font-size:11px;color:#888;margin-top:4px}
+.verify-warn{font-size:11px;color:#A32D2D;margin-top:4px;display:none}
 .row-label{font-size:13px;color:#1a1a1a;line-height:1.5;font-weight:500}
 
 .fridge-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -227,7 +233,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     <div class="card-body">
       <div class="staff-row">
         <span class="staff-label">担当者</span>
-        <select class="staff-select" id="cs1"><option value="">選択</option></select>
+        <select class="staff-select" id="cs1" onchange="if(state.r1===false)renderVerifySelect(1,this.value)"><option value="">選択</option></select>
       </div>
       <div class="when-section">
         <div class="when-label">いつ</div>
@@ -248,6 +254,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <textarea class="ng-area" id="n1-sym" rows="2" placeholder="症状を記入してください"></textarea>
         <div class="ng-label" id="lbl-act-1">対応：</div>
         <textarea class="ng-area" id="n1-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <div class="verify-area" id="verify-1">
+          <div class="verify-label"><i class="ti ti-user-check"></i> 対応確認者</div>
+          <select class="verify-select" id="vs1" onchange="onVerifySelect(1)"><option value="">選択してください</option></select>
+          <div class="verify-time" id="vt-1"></div>
+          <div class="verify-warn" id="vw-1">担当者を選択してください</div>
+        </div>
         <textarea class="ng-area" id="n1" rows="2" style="display:none"></textarea>
       </div>
     </div>
@@ -310,7 +322,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     <div class="card-body">
       <div class="staff-row">
         <span class="staff-label">担当者</span>
-        <select class="staff-select" id="cs3"><option value="">選択</option></select>
+        <select class="staff-select" id="cs3" onchange="if(state.r3===false)renderVerifySelect(3,this.value)"><option value="">選択</option></select>
       </div>
       <div class="when-section">
         <div class="when-label">いつ</div>
@@ -333,6 +345,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <textarea class="ng-area" id="n3-sym" rows="2" placeholder="症状を記入してください"></textarea>
         <div class="ng-label" id="lbl-act-3">対応：</div>
         <textarea class="ng-area" id="n3-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <div class="verify-area" id="verify-3">
+          <div class="verify-label"><i class="ti ti-user-check"></i> 対応確認者</div>
+          <select class="verify-select" id="vs3" onchange="onVerifySelect(3)"><option value="">選択してください</option></select>
+          <div class="verify-time" id="vt-3"></div>
+          <div class="verify-warn" id="vw-3">担当者を選択してください</div>
+        </div>
         <textarea class="ng-area" id="n3" rows="2" style="display:none"></textarea>
       </div>
     </div>
@@ -348,7 +366,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     <div class="card-body">
       <div class="staff-row">
         <span class="staff-label">担当者</span>
-        <select class="staff-select" id="cs4"><option value="">選択</option></select>
+        <select class="staff-select" id="cs4" onchange="if(state.r4===false)renderVerifySelect(4,this.value)"><option value="">選択</option></select>
       </div>
       <div class="when-section">
         <div class="when-label">いつ</div>
@@ -371,6 +389,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <textarea class="ng-area" id="n4-sym" rows="2" placeholder="症状を記入してください"></textarea>
         <div class="ng-label" id="lbl-act-4">対応：</div>
         <textarea class="ng-area" id="n4-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <div class="verify-area" id="verify-4">
+          <div class="verify-label"><i class="ti ti-user-check"></i> 対応確認者</div>
+          <select class="verify-select" id="vs4" onchange="onVerifySelect(4)"><option value="">選択してください</option></select>
+          <div class="verify-time" id="vt-4"></div>
+          <div class="verify-warn" id="vw-4">担当者を選択してください</div>
+        </div>
         <textarea class="ng-area" id="n4" rows="2" style="display:none"></textarea>
       </div>
     </div>
@@ -386,7 +410,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     <div class="card-body">
       <div class="staff-row">
         <span class="staff-label">担当者</span>
-        <select class="staff-select" id="cs5"><option value="">選択</option></select>
+        <select class="staff-select" id="cs5" onchange="if(state.r5===false)renderVerifySelect(5,this.value)"><option value="">選択</option></select>
       </div>
       <div class="when-section">
         <div class="when-label">いつ</div>
@@ -409,6 +433,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <textarea class="ng-area" id="n5-sym" rows="2" placeholder="症状を記入してください"></textarea>
         <div class="ng-label" id="lbl-act-5">対応：</div>
         <textarea class="ng-area" id="n5-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <div class="verify-area" id="verify-5">
+          <div class="verify-label"><i class="ti ti-user-check"></i> 対応確認者</div>
+          <select class="verify-select" id="vs5" onchange="onVerifySelect(5)"><option value="">選択してください</option></select>
+          <div class="verify-time" id="vt-5"></div>
+          <div class="verify-warn" id="vw-5">担当者を選択してください</div>
+        </div>
         <textarea class="ng-area" id="n5" rows="2" style="display:none"></textarea>
       </div>
     </div>
@@ -424,7 +454,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     <div class="card-body">
       <div class="staff-row">
         <span class="staff-label">担当者</span>
-        <select class="staff-select" id="cs6"><option value="">選択</option></select>
+        <select class="staff-select" id="cs6" onchange="if(state.r6===false)renderVerifySelect(6,this.value)"><option value="">選択</option></select>
       </div>
       <div class="when-section">
         <div class="when-label">いつ</div>
@@ -446,6 +476,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <textarea class="ng-area" id="n6-sym" rows="2" placeholder="症状を記入してください"></textarea>
         <div class="ng-label" id="lbl-act-6">対応：</div>
         <textarea class="ng-area" id="n6-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <div class="verify-area" id="verify-6">
+          <div class="verify-label"><i class="ti ti-user-check"></i> 対応確認者</div>
+          <select class="verify-select" id="vs6" onchange="onVerifySelect(6)"><option value="">選択してください</option></select>
+          <div class="verify-time" id="vt-6"></div>
+          <div class="verify-warn" id="vw-6">担当者を選択してください</div>
+        </div>
         <textarea class="ng-area" id="n6" rows="2" style="display:none"></textarea>
       </div>
     </div>
@@ -461,7 +497,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
     <div class="card-body">
       <div class="staff-row">
         <span class="staff-label">担当者</span>
-        <select class="staff-select" id="cs7"><option value="">選択</option></select>
+        <select class="staff-select" id="cs7" onchange="if(state.r7===false)renderVerifySelect(7,this.value)"><option value="">選択</option></select>
       </div>
       <div class="when-section">
         <div class="when-label">いつ</div>
@@ -488,6 +524,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <textarea class="ng-area" id="n7-sym" rows="2" placeholder="症状を記入してください"></textarea>
         <div class="ng-label" id="lbl-act-7">対応：</div>
         <textarea class="ng-area" id="n7-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <div class="verify-area" id="verify-7">
+          <div class="verify-label"><i class="ti ti-user-check"></i> 対応確認者</div>
+          <select class="verify-select" id="vs7" onchange="onVerifySelect(7)"><option value="">選択してください</option></select>
+          <div class="verify-time" id="vt-7"></div>
+          <div class="verify-warn" id="vw-7">担当者を選択してください</div>
+        </div>
         <textarea class="ng-area" id="n7" rows="2" style="display:none"></textarea>
       </div>
     </div>
@@ -550,6 +592,8 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   <input type="hidden" name="r1" id="f-r1">
   <input type="hidden" name="n1" id="f-n1">
   <input type="hidden" name="t1" id="f-t1">
+  <input type="hidden" name="v1" id="f-v1">
+  <input type="hidden" name="vt1" id="f-vt1">
 
   <input type="hidden" name="staff2" id="f-staff2">
   <input type="hidden" name="when2" id="f-when2">
@@ -565,30 +609,40 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   <input type="hidden" name="r3" id="f-r3">
   <input type="hidden" name="n3" id="f-n3">
   <input type="hidden" name="t3" id="f-t3">
+  <input type="hidden" name="v3" id="f-v3">
+  <input type="hidden" name="vt3" id="f-vt3">
 
   <input type="hidden" name="staff4" id="f-staff4">
   <input type="hidden" name="when4" id="f-when4">
   <input type="hidden" name="r4" id="f-r4">
   <input type="hidden" name="n4" id="f-n4">
   <input type="hidden" name="t4" id="f-t4">
+  <input type="hidden" name="v4" id="f-v4">
+  <input type="hidden" name="vt4" id="f-vt4">
 
   <input type="hidden" name="staff5" id="f-staff5">
   <input type="hidden" name="when5" id="f-when5">
   <input type="hidden" name="r5" id="f-r5">
   <input type="hidden" name="n5" id="f-n5">
   <input type="hidden" name="t5" id="f-t5">
+  <input type="hidden" name="v5" id="f-v5">
+  <input type="hidden" name="vt5" id="f-vt5">
 
   <input type="hidden" name="staff6" id="f-staff6">
   <input type="hidden" name="when6" id="f-when6">
   <input type="hidden" name="r6" id="f-r6">
   <input type="hidden" name="n6" id="f-n6">
   <input type="hidden" name="t6" id="f-t6">
+  <input type="hidden" name="v6" id="f-v6">
+  <input type="hidden" name="vt6" id="f-vt6">
 
   <input type="hidden" name="staff7" id="f-staff7">
   <input type="hidden" name="when7" id="f-when7">
   <input type="hidden" name="r7" id="f-r7">
   <input type="hidden" name="n7" id="f-n7">
   <input type="hidden" name="t7" id="f-t7">
+  <input type="hidden" name="v7" id="f-v7">
+  <input type="hidden" name="vt7" id="f-vt7">
 </form>
 
 <script>
@@ -901,7 +955,17 @@ function renderBtns(rid){
   if(actEl) actEl.style.display=isNG?'block':'none';
   if(lblSym) lblSym.classList.toggle('visible',isNG);
   if(lblAct) lblAct.classList.toggle('visible',isNG);
-  if(note) note.style.display='none'; // 隠しnは常に非表示
+  if(note) note.style.display='none';
+
+  // 対応確認者エリアはNGのときのみ表示
+  const verifyEl=document.getElementById('verify-'+num);
+  if(verifyEl) verifyEl.classList.toggle('visible',isNG);
+  if(isNG){
+    // 担当者が選択されていれば対応確認者プルダウンを更新
+    const staffId='cs'+num;
+    const staffEl=document.getElementById(staffId);
+    if(staffEl) renderVerifySelect(parseInt(num),staffEl.value);
+  } // 隠しnは常に非表示
 
   // 時刻表示（OK/NGどちらでも選択時に表示）
   if(timeEl){
@@ -913,6 +977,45 @@ function renderBtns(rid){
       timeEl.textContent='';
       timeEl.classList.remove('visible');
     }
+  }
+}
+
+// 対応確認者プルダウン（担当者以外のスタッフを表示）
+function renderVerifySelect(num, staffName){
+  const sel=document.getElementById('vs'+num);
+  const warn=document.getElementById('vw-'+num);
+  if(!sel) return;
+  if(!staffName||staffName==='選択'||staffName===''){
+    sel.innerHTML='<option value="">選択してください</option>';
+    if(warn) warn.style.display='block';
+    return;
+  }
+  if(warn) warn.style.display='none';
+  const list=loadStaff();
+  const current=sel.value;
+  sel.innerHTML='<option value="">選択してください</option>';
+  list.filter(n=>n!==staffName).forEach(name=>{
+    const opt=document.createElement('option');
+    opt.value=name;opt.textContent=name;
+    sel.appendChild(opt);
+  });
+  // 以前の選択を復元
+  if(current&&current!==staffName) sel.value=current;
+}
+
+// 対応確認者が選択されたとき確認時刻を記録
+const verifyTimes={1:null,3:null,4:null,5:null,6:null,7:null};
+
+function onVerifySelect(num){
+  const sel=document.getElementById('vs'+num);
+  const vtEl=document.getElementById('vt-'+num);
+  if(sel&&sel.value){
+    const now=new Date();
+    verifyTimes[num]=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    if(vtEl) vtEl.textContent=verifyTimes[num]+' に確認';
+  } else {
+    verifyTimes[num]=null;
+    if(vtEl) vtEl.textContent='';
   }
 }
 
@@ -1053,6 +1156,17 @@ function resetFormState(){
   });
   // checkTimesのリセット
   Object.keys(checkTimes).forEach(k=>checkTimes[k]=null);
+  // verifyTimesのリセット
+  Object.keys(verifyTimes).forEach(k=>verifyTimes[k]=null);
+  // 対応確認者プルダウンのリセット
+  [1,3,4,5,6,7].forEach(num=>{
+    const sel=document.getElementById('vs'+num);
+    if(sel) sel.innerHTML='<option value="">選択してください</option>';
+    const vtEl=document.getElementById('vt-'+num);
+    if(vtEl) vtEl.textContent='';
+    const verifyEl=document.getElementById('verify-'+num);
+    if(verifyEl) verifyEl.classList.remove('visible');
+  });
 
   // 冷蔵庫・冷凍庫のリセット
   if(fridgeSelected.cold) toggleFridge('cold');
@@ -1112,6 +1226,17 @@ function restoreRecord(r){
   setStateFromResult('r1',null,r['①結果']);
   if(r['①備考']&&r['①備考']!=='—') restoreNoteVal(1,r['①備考']);
   if(r['①確認時刻']&&r['①確認時刻']!=='—') checkTimes[1]=String(r['①確認時刻']);
+  if(r['①対応確認者']&&r['①対応確認者']!=='—'){
+    const staffEl=document.getElementById('cs1');
+    renderVerifySelect(1,staffEl?staffEl.value:'');
+    const vs=document.getElementById('vs1');
+    if(vs) vs.value=r['①対応確認者'];
+  }
+  if(r['①対応確認時刻']&&r['①対応確認時刻']!=='—'){
+    verifyTimes[1]=String(r['①対応確認時刻']);
+    const vtEl=document.getElementById('vt-1');
+    if(vtEl) vtEl.textContent=verifyTimes[1]+' に確認';
+  }
 
   const cs2=document.getElementById('cs2');
   ensureStaffOption(cs2,r['②担当者']);
@@ -1138,12 +1263,20 @@ function restoreRecord(r){
   setStateFromResult('r3',null,r['③-1結果']);
   if(r['③-1備考']&&r['③-1備考']!=='—') restoreNoteVal(3,r['③-1備考']);
   if(r['③-1確認時刻']&&r['③-1確認時刻']!=='—') checkTimes[3]=String(r['③-1確認時刻']);
+  if(r['③-1対応確認者']&&r['③-1対応確認者']!=='—'){ const s3=document.getElementById('cs3'); renderVerifySelect(3,s3?s3.value:''); const v3=document.getElementById('vs3'); if(v3) v3.value=r['③-1対応確認者']; }
+  if(r['③-1対応確認時刻']&&r['③-1対応確認時刻']!=='—'){ verifyTimes[3]=String(r['③-1対応確認時刻']); const vt3=document.getElementById('vt-3'); if(vt3) vt3.textContent=verifyTimes[3]+' に確認'; }
+
   setStateFromResult('r4',null,r['③-2結果']);
   if(r['③-2備考']&&r['③-2備考']!=='—') restoreNoteVal(4,r['③-2備考']);
   if(r['③-2確認時刻']&&r['③-2確認時刻']!=='—') checkTimes[4]=String(r['③-2確認時刻']);
+  if(r['③-2対応確認者']&&r['③-2対応確認者']!=='—'){ const s4=document.getElementById('cs4'); renderVerifySelect(4,s4?s4.value:''); const v4=document.getElementById('vs4'); if(v4) v4.value=r['③-2対応確認者']; }
+  if(r['③-2対応確認時刻']&&r['③-2対応確認時刻']!=='—'){ verifyTimes[4]=String(r['③-2対応確認時刻']); const vt4=document.getElementById('vt-4'); if(vt4) vt4.textContent=verifyTimes[4]+' に確認'; }
+
   setStateFromResult('r5',null,r['③-3結果']);
   if(r['③-3備考']&&r['③-3備考']!=='—') restoreNoteVal(5,r['③-3備考']);
   if(r['③-3確認時刻']&&r['③-3確認時刻']!=='—') checkTimes[5]=String(r['③-3確認時刻']);
+  if(r['③-3対応確認者']&&r['③-3対応確認者']!=='—'){ const s5=document.getElementById('cs5'); renderVerifySelect(5,s5?s5.value:''); const v5=document.getElementById('vs5'); if(v5) v5.value=r['③-3対応確認者']; }
+  if(r['③-3対応確認時刻']&&r['③-3対応確認時刻']!=='—'){ verifyTimes[5]=String(r['③-3対応確認時刻']); const vt5=document.getElementById('vt-5'); if(vt5) vt5.textContent=verifyTimes[5]+' に確認'; }
 
   const cs6=document.getElementById('cs6');
   ensureStaffOption(cs6,r['④-1担当者']);
@@ -1151,6 +1284,8 @@ function restoreRecord(r){
   setStateFromResult('r6',null,r['④-1結果']);
   if(r['④-1備考']&&r['④-1備考']!=='—') restoreNoteVal(6,r['④-1備考']);
   if(r['④-1確認時刻']&&r['④-1確認時刻']!=='—') checkTimes[6]=String(r['④-1確認時刻']);
+  if(r['④-1対応確認者']&&r['④-1対応確認者']!=='—'){ const s6=document.getElementById('cs6'); renderVerifySelect(6,s6?s6.value:''); const v6=document.getElementById('vs6'); if(v6) v6.value=r['④-1対応確認者']; }
+  if(r['④-1対応確認時刻']&&r['④-1対応確認時刻']!=='—'){ verifyTimes[6]=String(r['④-1対応確認時刻']); const vt6=document.getElementById('vt-6'); if(vt6) vt6.textContent=verifyTimes[6]+' に確認'; }
 
   const cs7=document.getElementById('cs7');
   ensureStaffOption(cs7,r['④-2担当者']);
@@ -1158,6 +1293,8 @@ function restoreRecord(r){
   setStateFromResult('r7',null,r['④-2結果']);
   if(r['④-2備考']&&r['④-2備考']!=='—') restoreNoteVal(7,r['④-2備考']);
   if(r['④-2確認時刻']&&r['④-2確認時刻']!=='—') checkTimes[7]=String(r['④-2確認時刻']);
+  if(r['④-2対応確認者']&&r['④-2対応確認者']!=='—'){ const s7=document.getElementById('cs7'); renderVerifySelect(7,s7?s7.value:''); const v7=document.getElementById('vs7'); if(v7) v7.value=r['④-2対応確認者']; }
+  if(r['④-2対応確認時刻']&&r['④-2対応確認時刻']!=='—'){ verifyTimes[7]=String(r['④-2対応確認時刻']); const vt7=document.getElementById('vt-7'); if(vt7) vt7.textContent=verifyTimes[7]+' に確認'; }
 
   updateSummary();
   // checkTimesが復元されたので、renderBtnsで時刻表示を更新
@@ -1250,6 +1387,8 @@ function setFormValues(dateStr, timeStr, status){
   document.getElementById('f-r1').value=f(state.r1);
   document.getElementById('f-n1').value=getNoteVal(1);
   document.getElementById('f-t1').value=checkTimes[1]||'—';
+  document.getElementById('f-v1').value=document.getElementById('vs1').value||'—';
+  document.getElementById('f-vt1').value=verifyTimes[1]||'—';
 
   document.getElementById('f-staff2').value=document.getElementById('cs2').value||'—';
   document.getElementById('f-when2').value=getWhenVal(2);
@@ -1265,30 +1404,40 @@ function setFormValues(dateStr, timeStr, status){
   document.getElementById('f-r3').value=f(state.r3);
   document.getElementById('f-n3').value=getNoteVal(3);
   document.getElementById('f-t3').value=checkTimes[3]||'—';
+  document.getElementById('f-v3').value=document.getElementById('vs3').value||'—';
+  document.getElementById('f-vt3').value=verifyTimes[3]||'—';
 
   document.getElementById('f-staff4').value=document.getElementById('cs4').value||'—';
   document.getElementById('f-when4').value=getWhenVal(4);
   document.getElementById('f-r4').value=f(state.r4);
   document.getElementById('f-n4').value=getNoteVal(4);
   document.getElementById('f-t4').value=checkTimes[4]||'—';
+  document.getElementById('f-v4').value=document.getElementById('vs4').value||'—';
+  document.getElementById('f-vt4').value=verifyTimes[4]||'—';
 
   document.getElementById('f-staff5').value=document.getElementById('cs5').value||'—';
   document.getElementById('f-when5').value=getWhenVal(5);
   document.getElementById('f-r5').value=f(state.r5);
   document.getElementById('f-n5').value=getNoteVal(5);
   document.getElementById('f-t5').value=checkTimes[5]||'—';
+  document.getElementById('f-v5').value=document.getElementById('vs5').value||'—';
+  document.getElementById('f-vt5').value=verifyTimes[5]||'—';
 
   document.getElementById('f-staff6').value=document.getElementById('cs6').value||'—';
   document.getElementById('f-when6').value=getWhenVal(6);
   document.getElementById('f-r6').value=f(state.r6);
   document.getElementById('f-n6').value=getNoteVal(6);
   document.getElementById('f-t6').value=checkTimes[6]||'—';
+  document.getElementById('f-v6').value=document.getElementById('vs6').value||'—';
+  document.getElementById('f-vt6').value=verifyTimes[6]||'—';
 
   document.getElementById('f-staff7').value=document.getElementById('cs7').value||'—';
   document.getElementById('f-when7').value=getWhenVal(7);
   document.getElementById('f-r7').value=f(state.r7);
   document.getElementById('f-n7').value=getNoteVal(7);
   document.getElementById('f-t7').value=checkTimes[7]||'—';
+  document.getElementById('f-v7').value=document.getElementById('vs7').value||'—';
+  document.getElementById('f-vt7').value=verifyTimes[7]||'—';
 }
 
 function saveDraft(){
