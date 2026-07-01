@@ -1012,9 +1012,9 @@ function setStateFromResult(rid,cid,resultStr){
   if(resultStr==='OK') state[rid]=true;
   else if(resultStr==='NG') state[rid]=false;
   else state[rid]=null;
-  // cidがある場合は旧来の丸ボタン、ない場合は2ボタン形式
+  // renderBtnsはrestoreRecord末尾でまとめて呼ぶ（checkTimes復元後に表示更新するため）
+  // cidがある場合（②温度チェック等）は旧来の丸ボタン形式でレンダリング
   if(cid) render(rid,cid);
-  else renderBtns(rid);
 }
 
 function resetFormState(){
