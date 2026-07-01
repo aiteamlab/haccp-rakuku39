@@ -76,13 +76,18 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 
 .howto-box{background:#F8F8F5;border-radius:6px;padding:8px 10px;font-size:11.5px;color:#666;margin-bottom:10px;line-height:1.6}
 
-.check-row{display:flex;align-items:flex-start;gap:10px;padding:8px 4px;cursor:pointer;border-radius:6px;transition:background .1s}
+.check-row{padding:8px 4px;border-radius:6px;transition:background .1s}
 .check-row:hover{background:#F8F8F5}
 .check-row.is-ok{background:#EDFAF4}
 .check-row.is-ng{background:#FEF2F2}
 .chk{width:22px;height:22px;border-radius:50%;border:1.5px solid #CCC;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .15s;color:transparent;font-size:12px}
 .chk.ok{background:#1D9E75;border-color:#1D9E75;color:#fff}
 .chk.ng{background:#E24B4A;border-color:#E24B4A;color:#fff}
+.check-btns{display:flex;gap:8px;margin-top:2px}
+.check-btn{display:flex;align-items:center;gap:6px;padding:10px 16px;border:1.5px solid #D0D0C8;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#555;cursor:pointer;font-family:inherit;transition:all .15s;flex:1;justify-content:center}
+.check-btn:hover{background:#F5F5F3}
+.check-btn.active-ok{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.check-btn.active-ng{background:#E24B4A;border-color:#E24B4A;color:#fff}
 .row-label{font-size:13px;color:#1a1a1a;line-height:1.5;font-weight:500}
 
 .fridge-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -229,12 +234,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <input type="text" class="when-other-input" id="when1-other" placeholder="その他の内容">
       </div>
       <div class="howto-box">📋 どのように：外観、におい、包装の状態、表示（期限、保存方法）を確認する。</div>
-      <div class="check-row" id="r1" onclick="tap('r1','c1')">
-        <div class="chk" id="c1"><i class="ti ti-check"></i></div>
-        <div style="flex:1">
-          <div class="row-label">確認OK（異常なし）</div>
-          <textarea class="ng-area" id="n1" rows="2" placeholder="問題があった場合：返品し、交換する旨を記入"></textarea>
+      <div class="check-row" id="r1">
+        <div class="check-btns">
+          <button class="check-btn" id="btn-ok-1" onclick="tapOK('r1')"><i class="ti ti-circle-check"></i> 確認OK（異常なし）</button>
+          <button class="check-btn" id="btn-ng-1" onclick="tapNG('r1')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
+        <textarea class="ng-area" id="n1" rows="2" placeholder="問題があった場合：返品し、交換する旨を記入"></textarea>
       </div>
     </div>
   </div>
@@ -309,12 +314,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <input type="text" class="when-other-input" id="when3-other" placeholder="その他の内容">
       </div>
       <div class="howto-box">📋 どのように：冷蔵庫内の保管状況を確認する。まな板や包丁等の器具類は用途別に使い分け、扱った都度十分洗浄し、消毒する。</div>
-      <div class="check-row" id="r3" onclick="tap('r3','c3')">
-        <div class="chk" id="c3"><i class="ti ti-check"></i></div>
-        <div style="flex:1">
-          <div class="row-label">確認OK（汚染なし）</div>
-          <textarea class="ng-area" id="n3" rows="2" placeholder="問題があった場合：加熱提供または使用中止・再洗浄消毒などを記入"></textarea>
+      <div class="check-row" id="r3">
+        <div class="check-btns">
+          <button class="check-btn" id="btn-ok-3" onclick="tapOK('r3')"><i class="ti ti-circle-check"></i> 確認OK（汚染なし）</button>
+          <button class="check-btn" id="btn-ng-3" onclick="tapNG('r3')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
+        <textarea class="ng-area" id="n3" rows="2" placeholder="問題があった場合：加熱提供または使用中止・再洗浄消毒などを記入"></textarea>
       </div>
     </div>
   </div>
@@ -342,12 +347,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <input type="text" class="when-other-input" id="when4-other" placeholder="その他の内容">
       </div>
       <div class="howto-box">📋 どのように：使用の都度、ざる・ミキサー・ボウル等の器具類を洗浄し、消毒する。</div>
-      <div class="check-row" id="r4" onclick="tap('r4','c4')">
-        <div class="chk" id="c4"><i class="ti ti-check"></i></div>
-        <div style="flex:1">
-          <div class="row-label">確認OK（洗浄・消毒完了）</div>
-          <textarea class="ng-area" id="n4" rows="2" placeholder="問題があった場合：再度洗剤で洗浄し消毒する旨を記入"></textarea>
+      <div class="check-row" id="r4">
+        <div class="check-btns">
+          <button class="check-btn" id="btn-ok-4" onclick="tapOK('r4')"><i class="ti ti-circle-check"></i> 確認OK（洗浄・消毒完了）</button>
+          <button class="check-btn" id="btn-ng-4" onclick="tapNG('r4')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
+        <textarea class="ng-area" id="n4" rows="2" placeholder="問題があった場合：再度洗剤で洗浄し消毒する旨を記入"></textarea>
       </div>
     </div>
   </div>
@@ -375,12 +380,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <input type="text" class="when-other-input" id="when5-other" placeholder="その他の内容">
       </div>
       <div class="howto-box">📋 どのように：トイレの洗浄・消毒を行う。特に便座、水洗レバー、手すり、ドアノブ等は入念に消毒する。</div>
-      <div class="check-row" id="r5" onclick="tap('r5','c5')">
-        <div class="chk" id="c5"><i class="ti ti-check"></i></div>
-        <div style="flex:1">
-          <div class="row-label">確認OK（洗浄・消毒完了）</div>
-          <textarea class="ng-area" id="n5" rows="2" placeholder="問題があった場合：再度洗剤で洗浄し消毒する旨を記入"></textarea>
+      <div class="check-row" id="r5">
+        <div class="check-btns">
+          <button class="check-btn" id="btn-ok-5" onclick="tapOK('r5')"><i class="ti ti-circle-check"></i> 確認OK（洗浄・消毒完了）</button>
+          <button class="check-btn" id="btn-ng-5" onclick="tapNG('r5')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
+        <textarea class="ng-area" id="n5" rows="2" placeholder="問題があった場合：再度洗剤で洗浄し消毒する旨を記入"></textarea>
       </div>
     </div>
   </div>
@@ -407,12 +412,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <input type="text" class="when-other-input" id="when6-other" placeholder="その他の内容">
       </div>
       <div class="howto-box">📋 どのように：従業員の体調、手の傷の有無、着衣等の確認を行う。</div>
-      <div class="check-row" id="r6" onclick="tap('r6','c6')">
-        <div class="chk" id="c6"><i class="ti ti-check"></i></div>
-        <div style="flex:1">
-          <div class="row-label">確認OK（健康状態に問題なし）</div>
-          <textarea class="ng-area" id="n6" rows="2" placeholder="問題があった場合：就業制限・絆創膏使用・着衣交換などを記入"></textarea>
+      <div class="check-row" id="r6">
+        <div class="check-btns">
+          <button class="check-btn" id="btn-ok-6" onclick="tapOK('r6')"><i class="ti ti-circle-check"></i> 確認OK（健康状態に問題なし）</button>
+          <button class="check-btn" id="btn-ng-6" onclick="tapNG('r6')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
+        <textarea class="ng-area" id="n6" rows="2" placeholder="問題があった場合：就業制限・絆創膏使用・着衣交換などを記入"></textarea>
       </div>
     </div>
   </div>
@@ -444,12 +449,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
         <input type="text" class="when-other-input" id="when7-other" placeholder="その他の内容">
       </div>
       <div class="howto-box">📋 どのように：衛生的な手洗いを行う。</div>
-      <div class="check-row" id="r7" onclick="tap('r7','c7')">
-        <div class="chk" id="c7"><i class="ti ti-check"></i></div>
-        <div style="flex:1">
-          <div class="row-label">確認OK（適切に実施）</div>
-          <textarea class="ng-area" id="n7" rows="2" placeholder="問題があった場合：即時手洗いを行わせた旨を記入"></textarea>
+      <div class="check-row" id="r7">
+        <div class="check-btns">
+          <button class="check-btn" id="btn-ok-7" onclick="tapOK('r7')"><i class="ti ti-circle-check"></i> 確認OK（適切に実施）</button>
+          <button class="check-btn" id="btn-ng-7" onclick="tapNG('r7')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
+        <textarea class="ng-area" id="n7" rows="2" placeholder="問題があった場合：即時手洗いを行わせた旨を記入"></textarea>
       </div>
     </div>
   </div>
@@ -812,6 +817,21 @@ function tap(rid,cid){
   updateSummary();
 }
 
+function tapOK(rid){
+  // 既にOKならnullに戻す（選択解除）、そうでなければOKにセット
+  state[rid]=state[rid]===true?null:true;
+  renderBtns(rid);
+  updateSummary();
+}
+
+function tapNG(rid){
+  // 既にNGならnullに戻す（選択解除）、そうでなければNGにセット
+  state[rid]=state[rid]===false?null:false;
+  renderBtns(rid);
+  updateSummary();
+}
+
+// 旧来の丸チェックボタン用（②の温度チェック等で使用）
 function render(rid,cid){
   const v=state[rid];
   const row=document.getElementById(rid);
@@ -823,6 +843,23 @@ function render(rid,cid){
   else if(v===false){chk.classList.add('ng');row.classList.add('is-ng');}
   const noteId='n'+rid.slice(1);
   const note=document.getElementById(noteId);
+  if(note) note.style.display=(v===false)?'block':'none';
+}
+
+// 2ボタン形式（①③-1〜④-2）用のレンダリング
+function renderBtns(rid){
+  const v=state[rid];
+  const num=rid.slice(1); // '1','3','4'...
+  const row=document.getElementById(rid);
+  const btnOK=document.getElementById('btn-ok-'+num);
+  const btnNG=document.getElementById('btn-ng-'+num);
+  const note=document.getElementById('n'+num);
+  if(!row||!btnOK||!btnNG) return;
+  row.classList.remove('is-ok','is-ng');
+  btnOK.classList.remove('active-ok');
+  btnNG.classList.remove('active-ng');
+  if(v===true){ btnOK.classList.add('active-ok'); row.classList.add('is-ok'); }
+  else if(v===false){ btnNG.classList.add('active-ng'); row.classList.add('is-ng'); }
   if(note) note.style.display=(v===false)?'block':'none';
 }
 
@@ -922,7 +959,9 @@ function setStateFromResult(rid,cid,resultStr){
   if(resultStr==='OK') state[rid]=true;
   else if(resultStr==='NG') state[rid]=false;
   else state[rid]=null;
-  render(rid,cid);
+  // cidがある場合は旧来の丸ボタン、ない場合は2ボタン形式
+  if(cid) render(rid,cid);
+  else renderBtns(rid);
 }
 
 function resetFormState(){
@@ -1000,7 +1039,7 @@ function restoreRecord(r){
   const cs1=document.getElementById('cs1');
   ensureStaffOption(cs1,r['①担当者']);
   if(r['①担当者']&&r['①担当者']!=='—') cs1.value=r['①担当者'];
-  setStateFromResult('r1','c1',r['①結果']);
+  setStateFromResult('r1',null,r['①結果']);
   if(r['①備考']&&r['①備考']!=='—') document.getElementById('n1').value=r['①備考'];
 
   const cs2=document.getElementById('cs2');
@@ -1025,23 +1064,23 @@ function restoreRecord(r){
     ensureStaffOption(cs,r[staffKey]);
     if(r[staffKey]&&r[staffKey]!=='—') cs.value=r[staffKey];
   });
-  setStateFromResult('r3','c3',r['③-1結果']);
+  setStateFromResult('r3',null,r['③-1結果']);
   if(r['③-1備考']&&r['③-1備考']!=='—') document.getElementById('n3').value=r['③-1備考'];
-  setStateFromResult('r4','c4',r['③-2結果']);
+  setStateFromResult('r4',null,r['③-2結果']);
   if(r['③-2備考']&&r['③-2備考']!=='—') document.getElementById('n4').value=r['③-2備考'];
-  setStateFromResult('r5','c5',r['③-3結果']);
+  setStateFromResult('r5',null,r['③-3結果']);
   if(r['③-3備考']&&r['③-3備考']!=='—') document.getElementById('n5').value=r['③-3備考'];
 
   const cs6=document.getElementById('cs6');
   ensureStaffOption(cs6,r['④-1担当者']);
   if(r['④-1担当者']&&r['④-1担当者']!=='—') cs6.value=r['④-1担当者'];
-  setStateFromResult('r6','c6',r['④-1結果']);
+  setStateFromResult('r6',null,r['④-1結果']);
   if(r['④-1備考']&&r['④-1備考']!=='—') document.getElementById('n6').value=r['④-1備考'];
 
   const cs7=document.getElementById('cs7');
   ensureStaffOption(cs7,r['④-2担当者']);
   if(r['④-2担当者']&&r['④-2担当者']!=='—') cs7.value=r['④-2担当者'];
-  setStateFromResult('r7','c7',r['④-2結果']);
+  setStateFromResult('r7',null,r['④-2結果']);
   if(r['④-2備考']&&r['④-2備考']!=='—') document.getElementById('n7').value=r['④-2備考'];
 
   updateSummary();
