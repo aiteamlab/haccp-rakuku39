@@ -88,6 +88,10 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .check-btn:hover{background:#F5F5F3}
 .check-btn.active-ok{background:#1D9E75;border-color:#1D9E75;color:#fff}
 .check-btn.active-ng{background:#E24B4A;border-color:#E24B4A;color:#fff}
+.check-time{font-size:11px;color:#888;margin-top:5px;display:none}
+.check-time.visible{display:block}
+.ng-label{font-size:11px;color:#888;margin-top:8px;margin-bottom:2px;font-weight:600;display:none}
+.ng-label.visible{display:block}
 .row-label{font-size:13px;color:#1a1a1a;line-height:1.5;font-weight:500}
 
 .fridge-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -239,7 +243,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
           <button class="check-btn" id="btn-ok-1" onclick="tapOK('r1')"><i class="ti ti-circle-check"></i> 確認OK（異常なし）</button>
           <button class="check-btn" id="btn-ng-1" onclick="tapNG('r1')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
-        <textarea class="ng-area" id="n1" rows="2" placeholder="問題があった場合：返品し、交換する旨を記入"></textarea>
+        <div class="check-time" id="time-1"></div>
+        <div class="ng-label" id="lbl-sym-1">症状：</div>
+        <textarea class="ng-area" id="n1-sym" rows="2" placeholder="症状を記入してください"></textarea>
+        <div class="ng-label" id="lbl-act-1">対応：</div>
+        <textarea class="ng-area" id="n1-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <textarea class="ng-area" id="n1" rows="2" style="display:none"></textarea>
       </div>
     </div>
   </div>
@@ -319,7 +328,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
           <button class="check-btn" id="btn-ok-3" onclick="tapOK('r3')"><i class="ti ti-circle-check"></i> 確認OK（汚染なし）</button>
           <button class="check-btn" id="btn-ng-3" onclick="tapNG('r3')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
-        <textarea class="ng-area" id="n3" rows="2" placeholder="問題があった場合：加熱提供または使用中止・再洗浄消毒などを記入"></textarea>
+        <div class="check-time" id="time-3"></div>
+        <div class="ng-label" id="lbl-sym-3">症状：</div>
+        <textarea class="ng-area" id="n3-sym" rows="2" placeholder="症状を記入してください"></textarea>
+        <div class="ng-label" id="lbl-act-3">対応：</div>
+        <textarea class="ng-area" id="n3-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <textarea class="ng-area" id="n3" rows="2" style="display:none"></textarea>
       </div>
     </div>
   </div>
@@ -352,7 +366,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
           <button class="check-btn" id="btn-ok-4" onclick="tapOK('r4')"><i class="ti ti-circle-check"></i> 確認OK（洗浄・消毒完了）</button>
           <button class="check-btn" id="btn-ng-4" onclick="tapNG('r4')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
-        <textarea class="ng-area" id="n4" rows="2" placeholder="問題があった場合：再度洗剤で洗浄し消毒する旨を記入"></textarea>
+        <div class="check-time" id="time-4"></div>
+        <div class="ng-label" id="lbl-sym-4">症状：</div>
+        <textarea class="ng-area" id="n4-sym" rows="2" placeholder="症状を記入してください"></textarea>
+        <div class="ng-label" id="lbl-act-4">対応：</div>
+        <textarea class="ng-area" id="n4-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <textarea class="ng-area" id="n4" rows="2" style="display:none"></textarea>
       </div>
     </div>
   </div>
@@ -385,7 +404,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
           <button class="check-btn" id="btn-ok-5" onclick="tapOK('r5')"><i class="ti ti-circle-check"></i> 確認OK（洗浄・消毒完了）</button>
           <button class="check-btn" id="btn-ng-5" onclick="tapNG('r5')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
-        <textarea class="ng-area" id="n5" rows="2" placeholder="問題があった場合：再度洗剤で洗浄し消毒する旨を記入"></textarea>
+        <div class="check-time" id="time-5"></div>
+        <div class="ng-label" id="lbl-sym-5">症状：</div>
+        <textarea class="ng-area" id="n5-sym" rows="2" placeholder="症状を記入してください"></textarea>
+        <div class="ng-label" id="lbl-act-5">対応：</div>
+        <textarea class="ng-area" id="n5-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <textarea class="ng-area" id="n5" rows="2" style="display:none"></textarea>
       </div>
     </div>
   </div>
@@ -417,7 +441,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
           <button class="check-btn" id="btn-ok-6" onclick="tapOK('r6')"><i class="ti ti-circle-check"></i> 確認OK（健康状態に問題なし）</button>
           <button class="check-btn" id="btn-ng-6" onclick="tapNG('r6')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
-        <textarea class="ng-area" id="n6" rows="2" placeholder="問題があった場合：就業制限・絆創膏使用・着衣交換などを記入"></textarea>
+        <div class="check-time" id="time-6"></div>
+        <div class="ng-label" id="lbl-sym-6">症状：</div>
+        <textarea class="ng-area" id="n6-sym" rows="2" placeholder="症状を記入してください"></textarea>
+        <div class="ng-label" id="lbl-act-6">対応：</div>
+        <textarea class="ng-area" id="n6-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <textarea class="ng-area" id="n6" rows="2" style="display:none"></textarea>
       </div>
     </div>
   </div>
@@ -454,7 +483,12 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
           <button class="check-btn" id="btn-ok-7" onclick="tapOK('r7')"><i class="ti ti-circle-check"></i> 確認OK（適切に実施）</button>
           <button class="check-btn" id="btn-ng-7" onclick="tapNG('r7')"><i class="ti ti-alert-circle"></i> 異常あり</button>
         </div>
-        <textarea class="ng-area" id="n7" rows="2" placeholder="問題があった場合：即時手洗いを行わせた旨を記入"></textarea>
+        <div class="check-time" id="time-7"></div>
+        <div class="ng-label" id="lbl-sym-7">症状：</div>
+        <textarea class="ng-area" id="n7-sym" rows="2" placeholder="症状を記入してください"></textarea>
+        <div class="ng-label" id="lbl-act-7">対応：</div>
+        <textarea class="ng-area" id="n7-act" rows="2" placeholder="対応内容を記入してください"></textarea>
+        <textarea class="ng-area" id="n7" rows="2" style="display:none"></textarea>
       </div>
     </div>
   </div>
@@ -791,18 +825,29 @@ function tap(rid,cid){
   updateSummary();
 }
 
+const checkTimes={1:null,3:null,4:null,5:null,6:null,7:null};
+
 function tapOK(rid){
-  // 既にOKならnullに戻す（選択解除）、そうでなければOKにセット
   state[rid]=state[rid]===true?null:true;
+  const num=parseInt(rid.slice(1));
+  if(state[rid]===true) recordCheckTime(num);
+  else checkTimes[num]=null;
   renderBtns(rid);
   updateSummary();
 }
 
 function tapNG(rid){
-  // 既にNGならnullに戻す（選択解除）、そうでなければNGにセット
   state[rid]=state[rid]===false?null:false;
+  const num=parseInt(rid.slice(1));
+  if(state[rid]===false) recordCheckTime(num);
+  else checkTimes[num]=null;
   renderBtns(rid);
   updateSummary();
+}
+
+function recordCheckTime(num){
+  const now=new Date();
+  checkTimes[num]=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
 }
 
 // 旧来の丸チェックボタン用（②の温度チェック等で使用）
@@ -823,18 +868,46 @@ function render(rid,cid){
 // 2ボタン形式（①③-1〜④-2）用のレンダリング
 function renderBtns(rid){
   const v=state[rid];
-  const num=rid.slice(1); // '1','3','4'...
+  const num=rid.slice(1);
   const row=document.getElementById(rid);
   const btnOK=document.getElementById('btn-ok-'+num);
   const btnNG=document.getElementById('btn-ng-'+num);
   const note=document.getElementById('n'+num);
+  const symEl=document.getElementById('n'+num+'-sym');
+  const actEl=document.getElementById('n'+num+'-act');
+  const lblSym=document.getElementById('lbl-sym-'+num);
+  const lblAct=document.getElementById('lbl-act-'+num);
+  const timeEl=document.getElementById('time-'+num);
   if(!row||!btnOK||!btnNG) return;
+
   row.classList.remove('is-ok','is-ng');
   btnOK.classList.remove('active-ok');
   btnNG.classList.remove('active-ng');
+
+  const isNG=(v===false);
+  const isSelected=(v!==null);
+
   if(v===true){ btnOK.classList.add('active-ok'); row.classList.add('is-ok'); }
   else if(v===false){ btnNG.classList.add('active-ng'); row.classList.add('is-ng'); }
-  if(note) note.style.display=(v===false)?'block':'none';
+
+  // 症状・対応エリアはNGのときのみ表示
+  if(symEl) symEl.style.display=isNG?'block':'none';
+  if(actEl) actEl.style.display=isNG?'block':'none';
+  if(lblSym) lblSym.classList.toggle('visible',isNG);
+  if(lblAct) lblAct.classList.toggle('visible',isNG);
+  if(note) note.style.display='none'; // 隠しnは常に非表示
+
+  // 時刻表示（OK/NGどちらでも選択時に表示）
+  if(timeEl){
+    const t=checkTimes[parseInt(num)];
+    if(isSelected && t){
+      timeEl.textContent=t+' に確認';
+      timeEl.classList.add('visible');
+    } else {
+      timeEl.textContent='';
+      timeEl.classList.remove('visible');
+    }
+  }
 }
 
 function selectWhen(num,label,btn){
@@ -960,6 +1033,20 @@ function resetFormState(){
     const el=document.getElementById(id);
     if(el){el.value='';el.style.display='none';}
   });
+  ['n1-sym','n1-act','n3-sym','n3-act','n4-sym','n4-act','n5-sym','n5-act','n6-sym','n6-act','n7-sym','n7-act'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.value='';el.style.display='none';}
+  });
+  ['lbl-sym-1','lbl-act-1','lbl-sym-3','lbl-act-3','lbl-sym-4','lbl-act-4','lbl-sym-5','lbl-act-5','lbl-sym-6','lbl-act-6','lbl-sym-7','lbl-act-7'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('visible');
+  });
+  ['time-1','time-3','time-4','time-5','time-6','time-7'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.textContent='';el.classList.remove('visible');}
+  });
+  // checkTimesのリセット
+  Object.keys(checkTimes).forEach(k=>checkTimes[k]=null);
 
   // 冷蔵庫・冷凍庫のリセット
   if(fridgeSelected.cold) toggleFridge('cold');
@@ -1017,7 +1104,7 @@ function restoreRecord(r){
   ensureStaffOption(cs1,r['①担当者']);
   if(r['①担当者']&&r['①担当者']!=='—') cs1.value=r['①担当者'];
   setStateFromResult('r1',null,r['①結果']);
-  if(r['①備考']&&r['①備考']!=='—') document.getElementById('n1').value=r['①備考'];
+  if(r['①備考']&&r['①備考']!=='—') restoreNoteVal(1,r['①備考']);
 
   const cs2=document.getElementById('cs2');
   ensureStaffOption(cs2,r['②担当者']);
@@ -1042,23 +1129,23 @@ function restoreRecord(r){
     if(r[staffKey]&&r[staffKey]!=='—') cs.value=r[staffKey];
   });
   setStateFromResult('r3',null,r['③-1結果']);
-  if(r['③-1備考']&&r['③-1備考']!=='—') document.getElementById('n3').value=r['③-1備考'];
+  if(r['③-1備考']&&r['③-1備考']!=='—') restoreNoteVal(3,r['③-1備考']);
   setStateFromResult('r4',null,r['③-2結果']);
-  if(r['③-2備考']&&r['③-2備考']!=='—') document.getElementById('n4').value=r['③-2備考'];
+  if(r['③-2備考']&&r['③-2備考']!=='—') restoreNoteVal(4,r['③-2備考']);
   setStateFromResult('r5',null,r['③-3結果']);
-  if(r['③-3備考']&&r['③-3備考']!=='—') document.getElementById('n5').value=r['③-3備考'];
+  if(r['③-3備考']&&r['③-3備考']!=='—') restoreNoteVal(5,r['③-3備考']);
 
   const cs6=document.getElementById('cs6');
   ensureStaffOption(cs6,r['④-1担当者']);
   if(r['④-1担当者']&&r['④-1担当者']!=='—') cs6.value=r['④-1担当者'];
   setStateFromResult('r6',null,r['④-1結果']);
-  if(r['④-1備考']&&r['④-1備考']!=='—') document.getElementById('n6').value=r['④-1備考'];
+  if(r['④-1備考']&&r['④-1備考']!=='—') restoreNoteVal(6,r['④-1備考']);
 
   const cs7=document.getElementById('cs7');
   ensureStaffOption(cs7,r['④-2担当者']);
   if(r['④-2担当者']&&r['④-2担当者']!=='—') cs7.value=r['④-2担当者'];
   setStateFromResult('r7',null,r['④-2結果']);
-  if(r['④-2備考']&&r['④-2備考']!=='—') document.getElementById('n7').value=r['④-2備考'];
+  if(r['④-2備考']&&r['④-2備考']!=='—') restoreNoteVal(7,r['④-2備考']);
 
   updateSummary();
 
@@ -1103,6 +1190,35 @@ function getMealsVal(){
   return String(num);
 }
 
+// 症状・対応テキストを「症状：○○／対応：○○」の形式で結合
+function getNoteVal(num){
+  const sym=(document.getElementById('n'+num+'-sym')||{}).value||'';
+  const act=(document.getElementById('n'+num+'-act')||{}).value||'';
+  if(!sym&&!act) return '';
+  const parts=[];
+  if(sym) parts.push('症状：'+sym);
+  if(act) parts.push('対応：'+act);
+  return parts.join('／');
+}
+
+// 「症状：○○／対応：○○」形式の文字列をsym/actに分解して復元
+function restoreNoteVal(num, noteStr){
+  if(!noteStr||noteStr==='—') return;
+  const symEl=document.getElementById('n'+num+'-sym');
+  const actEl=document.getElementById('n'+num+'-act');
+  if(!symEl||!actEl) return;
+  // 新形式（症状：○○／対応：○○）を分解
+  const symMatch=noteStr.match(/症状：([^／]*)/);
+  const actMatch=noteStr.match(/対応：([^／]*)/);
+  if(symMatch||actMatch){
+    if(symMatch) symEl.value=symMatch[1].trim();
+    if(actMatch) actEl.value=actMatch[1].trim();
+  } else {
+    // 旧形式（分けられていない）はsymにそのまま入れる
+    symEl.value=noteStr;
+  }
+}
+
 function getWhenVal(num){
   return whenFixed[num]||'—';
 }
@@ -1118,7 +1234,7 @@ function setFormValues(dateStr, timeStr, status){
   document.getElementById('f-staff1').value=document.getElementById('cs1').value||'—';
   document.getElementById('f-when1').value=getWhenVal(1);
   document.getElementById('f-r1').value=f(state.r1);
-  document.getElementById('f-n1').value=document.getElementById('n1').value||'';
+  document.getElementById('f-n1').value=getNoteVal(1);
 
   document.getElementById('f-staff2').value=document.getElementById('cs2').value||'—';
   document.getElementById('f-when2').value=getWhenVal(2);
@@ -1132,27 +1248,27 @@ function setFormValues(dateStr, timeStr, status){
   document.getElementById('f-staff3').value=document.getElementById('cs3').value||'—';
   document.getElementById('f-when3').value=getWhenVal(3);
   document.getElementById('f-r3').value=f(state.r3);
-  document.getElementById('f-n3').value=document.getElementById('n3').value||'';
+  document.getElementById('f-n3').value=getNoteVal(3);
 
   document.getElementById('f-staff4').value=document.getElementById('cs4').value||'—';
   document.getElementById('f-when4').value=getWhenVal(4);
   document.getElementById('f-r4').value=f(state.r4);
-  document.getElementById('f-n4').value=document.getElementById('n4').value||'';
+  document.getElementById('f-n4').value=getNoteVal(4);
 
   document.getElementById('f-staff5').value=document.getElementById('cs5').value||'—';
   document.getElementById('f-when5').value=getWhenVal(5);
   document.getElementById('f-r5').value=f(state.r5);
-  document.getElementById('f-n5').value=document.getElementById('n5').value||'';
+  document.getElementById('f-n5').value=getNoteVal(5);
 
   document.getElementById('f-staff6').value=document.getElementById('cs6').value||'—';
   document.getElementById('f-when6').value=getWhenVal(6);
   document.getElementById('f-r6').value=f(state.r6);
-  document.getElementById('f-n6').value=document.getElementById('n6').value||'';
+  document.getElementById('f-n6').value=getNoteVal(6);
 
   document.getElementById('f-staff7').value=document.getElementById('cs7').value||'—';
   document.getElementById('f-when7').value=getWhenVal(7);
   document.getElementById('f-r7').value=f(state.r7);
-  document.getElementById('f-n7').value=document.getElementById('n7').value||'';
+  document.getElementById('f-n7').value=getNoteVal(7);
 }
 
 function saveDraft(){
