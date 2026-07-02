@@ -18,6 +18,9 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .btn-check{padding:8px 16px;background:#fff;color:#555;border:1px solid #CCC;border-radius:7px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;text-decoration:none}
 .header-btns{display:flex;gap:8px;flex-wrap:wrap}
 .loading{text-align:center;padding:40px;color:#888;font-size:14px}
+.meal-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.meal-tab{padding:8px 20px;border:1.5px solid #D0D0C8;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#555;cursor:pointer;font-family:inherit}
+.meal-tab.active{background:#1D9E75;color:#fff;border-color:#1D9E75}
 .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .stat{background:#fff;border:1px solid #E0E0D8;border-radius:10px;padding:14px 16px}
 .stat-label{font-size:11px;color:#888;margin-bottom:6px}
@@ -43,6 +46,9 @@ tr:hover td{background:#F8F8F5}
 .badge-ng{background:#FCEBEB;color:#A32D2D}
 .badge-dash{background:#F1EFE8;color:#888}
 .badge-draft{background:#FAEEDA;color:#BA7517}
+.badge-meal-朝食{background:#FFF3E0;color:#E65100}
+.badge-meal-昼食{background:#E8F5E9;color:#1B5E20}
+.badge-meal-夕食{background:#EDE7F6;color:#311B92}
 .ng-list{list-style:none}
 .ng-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #F0F0E8;font-size:13px}
 .ng-item:last-child{border-bottom:none}
@@ -89,6 +95,13 @@ tr:hover td{background:#F8F8F5}
     <button onclick="applyDateRange()" style="padding:5px 14px;background:#1D9E75;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">適用</button>
   </div>
 
+  <div class="meal-tabs">
+    <button class="meal-tab active" id="mtab-all" onclick="setMealFilter('all',this)">全区分</button>
+    <button class="meal-tab" id="mtab-朝食" onclick="setMealFilter('朝食',this)">朝食</button>
+    <button class="meal-tab" id="mtab-昼食" onclick="setMealFilter('昼食',this)">昼食</button>
+    <button class="meal-tab" id="mtab-夕食" onclick="setMealFilter('夕食',this)">夕食</button>
+  </div>
+
   <div id="loading" class="loading"><i class="ti ti-loader"></i> データを読み込み中...</div>
   <div id="main" style="display:none">
 
@@ -116,7 +129,6 @@ tr:hover td{background:#F8F8F5}
     </div>
 
     <div class="grid2">
-
       <div class="card">
         <div class="card-head">
           <i class="ti ti-chart-bar card-icon"></i>
@@ -126,7 +138,6 @@ tr:hover td{background:#F8F8F5}
           <div class="chart-wrap"><canvas id="ng-chart"></canvas></div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-head">
           <i class="ti ti-temperature card-icon"></i>
@@ -136,7 +147,6 @@ tr:hover td{background:#F8F8F5}
           <div class="chart-wrap"><canvas id="temp-chart"></canvas></div>
         </div>
       </div>
-
     </div>
 
     <div class="card" style="margin-bottom:16px">
@@ -159,6 +169,7 @@ tr:hover td{background:#F8F8F5}
           <thead>
             <tr>
               <th>記録日</th>
+              <th>区分</th>
               <th>ステータス</th>
               <th>食数</th>
               <th>①受入</th>
@@ -179,28 +190,29 @@ tr:hover td{background:#F8F8F5}
 </div>
 
 <script>
-
 function fmtDate(v){
   if(!v||v==='—') return '—';
-  const s = String(v);
-  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const s=String(v);
+  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if(m) return m[1]+'-'+m[2]+'-'+m[3];
   return s;
 }
+
 const GAS_URL='https://script.google.com/macros/s/AKfycbxc_bseD-NLtKP-HQakcYljeXOYav05CZc3-9XglDj5gPJlEf0NxISkFbWWPy44ETxj/exec';
 let allData=[];
 let periodDays=7;
+let mealFilter='all';
 let ngChart=null;
 let tempChart=null;
 
 const CHECK_DEFS=[
-  {key:'①結果', label:'①受入確認',     note:'①備考'},
-  {key:'②結果', label:'②庫内温度',     note:'②備考'},
-  {key:'③-1結果', label:'③-1交差汚染', note:'③-1備考'},
-  {key:'③-2結果', label:'③-2器具洗浄', note:'③-2備考'},
-  {key:'③-3結果', label:'③-3トイレ',   note:'③-3備考'},
-  {key:'④-1結果', label:'④-1健康管理', note:'④-1備考'},
-  {key:'④-2結果', label:'④-2手洗い',   note:'④-2備考'}
+  {key:'①結果', label:'①受入確認'},
+  {key:'②結果', label:'②庫内温度'},
+  {key:'③-1結果', label:'③-1交差汚染'},
+  {key:'③-2結果', label:'③-2器具洗浄'},
+  {key:'③-3結果', label:'③-3トイレ'},
+  {key:'④-1結果', label:'④-1健康管理'},
+  {key:'④-2結果', label:'④-2手洗い'}
 ];
 
 function setPeriod(days,btn){
@@ -220,6 +232,13 @@ function setPeriod(days,btn){
   }
 }
 
+function setMealFilter(meal,btn){
+  mealFilter=meal;
+  document.querySelectorAll('.meal-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
 function applyDateRange(){
   const from=document.getElementById('date-from').value;
   const to=document.getElementById('date-to').value;
@@ -231,11 +250,10 @@ function applyDateRange(){
 function renderAllWithRange(from,to){
   const fromDate=new Date(from+'T00:00:00');
   const toDate=new Date(to+'T23:59:59');
-  const data=allData.filter(r=>{
-    const dateStr=String(r['記録日']).slice(0,10);
-    const d=new Date(dateStr+'T00:00:00');
+  const data=applyMealFilter(allData.filter(r=>{
+    const d=new Date(String(r['記録日']).slice(0,10)+'T00:00:00');
     return d>=fromDate && d<=toDate;
-  });
+  }));
   renderWithData(data);
 }
 
@@ -266,6 +284,11 @@ function filterByPeriod(data){
   });
 }
 
+function applyMealFilter(data){
+  if(mealFilter==='all') return data;
+  return data.filter(r=>r['区分']===mealFilter);
+}
+
 function badge(v){
   if(v==='OK') return '<span class="badge badge-ok">OK</span>';
   if(v==='NG') return '<span class="badge badge-ng">NG</span>';
@@ -278,6 +301,11 @@ function statusBadge(v){
   return '<span class="badge badge-dash">'+(v||'—')+'</span>';
 }
 
+function mealBadge(v){
+  const cls='badge-meal-'+(v||'');
+  return '<span class="badge '+cls+'">'+(v||'—')+'</span>';
+}
+
 function hasNG(r){
   return CHECK_DEFS.some(d=>r[d.key]==='NG');
 }
@@ -285,18 +313,18 @@ function hasNG(r){
 function staffSummary(r){
   const names=['①担当者','②担当者','③-1担当者','③-2担当者','③-3担当者','④-1担当者','④-2担当者']
     .map(k=>r[k]).filter(v=>v&&v!=='—');
-  const uniq=[...new Set(names)];
-  return uniq.join('、');
+  return [...new Set(names)].join('、');
 }
 
 function renderAll(){
-  const data=filterByPeriod(allData);
+  const data=applyMealFilter(filterByPeriod(allData));
   renderWithData(data);
 }
 
 function renderWithData(data){
-  const sorted=[...data].sort((a,b)=>String(b['記録日']).localeCompare(String(a['記録日'])));
+  const sorted=[...data].sort((a,b)=>String(b['記録日']).localeCompare(String(a['記録日']))||['朝食','昼食','夕食'].indexOf(a['区分'])-['朝食','昼食','夕食'].indexOf(b['区分']));
 
+  // サマリー
   document.getElementById('total-count').textContent=data.length;
   const ngRows=data.filter(hasNG);
   const okRows=data.filter(r=>CHECK_DEFS.every(d=>r[d.key]==='OK'));
@@ -306,12 +334,13 @@ function renderWithData(data){
   document.getElementById('ng-count').textContent=ngRows.length;
   if(sorted.length>0){
     document.getElementById('last-date').textContent=fmtDate(sorted[0]['記録日']);
-    document.getElementById('last-staff').textContent=staffSummary(sorted[0]);
+    document.getElementById('last-staff').textContent=sorted[0]['区分']||'';
   } else {
     document.getElementById('last-date').textContent='—';
     document.getElementById('last-staff').textContent='';
   }
 
+  // 項目別NGグラフ
   const ngLabels=CHECK_DEFS.map(d=>d.label);
   const ngCounts=CHECK_DEFS.map(d=>data.filter(r=>r[d.key]==='NG').length);
 
@@ -341,48 +370,41 @@ function renderWithData(data){
     }
   });
 
-  const tempSource=[...data]
+  // 庫内温度推移グラフ（朝食・昼食・夕食の3色）
+  const MEAL_COLORS={
+    '朝食':{border:'#E65100',bg:'rgba(230,81,0,0.1)'},
+    '昼食':{border:'#1D9E75',bg:'rgba(29,158,117,0.1)'},
+    '夕食':{border:'#311B92',bg:'rgba(49,27,146,0.1)'}
+  };
+  const meals=mealFilter==='all'?['朝食','昼食','夕食']:[mealFilter];
+  const tempBase=[...data]
     .filter(r=>(r['②冷蔵温度(℃)']&&r['②冷蔵温度(℃)']!=='—')||(r['②冷凍温度(℃)']&&r['②冷凍温度(℃)']!=='—'))
     .sort((a,b)=>new Date(a['記録日'])-new Date(b['記録日']))
-    .slice(-20);
+    .slice(-30);
+  const tempLabels=[...new Set(tempBase.map(r=>fmtDate(r['記録日'])))];
 
   if(tempChart) tempChart.destroy();
   const ctx2=document.getElementById('temp-chart').getContext('2d');
+  const tempDatasets=[];
+  meals.forEach(meal=>{
+    const mealData=tempBase.filter(r=>r['区分']===meal);
+    const col=MEAL_COLORS[meal]||{border:'#999',bg:'rgba(153,153,153,0.1)'};
+    if(mealData.length>0){
+      tempDatasets.push({
+        label:meal+'冷蔵(℃)',
+        data:tempLabels.map(d=>{
+          const r=mealData.find(x=>fmtDate(x['記録日'])===d);
+          return r&&r['②冷蔵温度(℃)']&&r['②冷蔵温度(℃)']!=='—'?parseFloat(r['②冷蔵温度(℃)']):null;
+        }),
+        borderColor:col.border,
+        backgroundColor:col.bg,
+        borderWidth:2,pointRadius:3,tension:0.3,spanGaps:true
+      });
+    }
+  });
   tempChart=new Chart(ctx2,{
     type:'line',
-    data:{
-      labels:tempSource.map(r=>fmtDate(r['記録日'])),
-      datasets:[
-        {
-          label:'冷蔵庫(℃)',
-          data:tempSource.map(r=>{
-            const v=r['②冷蔵温度(℃)'];
-            return (v&&v!=='—')?parseFloat(v):null;
-          }),
-          borderColor:'#1D9E75',
-          backgroundColor:'#E1F5EE',
-          borderWidth:2,
-          pointRadius:3,
-          pointBackgroundColor:'#1D9E75',
-          tension:0.3,
-          spanGaps:true
-        },
-        {
-          label:'冷凍庫(℃)',
-          data:tempSource.map(r=>{
-            const v=r['②冷凍温度(℃)'];
-            return (v&&v!=='—')?parseFloat(v):null;
-          }),
-          borderColor:'#3B5BDB',
-          backgroundColor:'#E8ECFB',
-          borderWidth:2,
-          pointRadius:3,
-          pointBackgroundColor:'#3B5BDB',
-          tension:0.3,
-          spanGaps:true
-        }
-      ]
-    },
+    data:{labels:tempLabels,datasets:tempDatasets},
     options:{
       responsive:true,
       maintainAspectRatio:false,
@@ -394,31 +416,44 @@ function renderWithData(data){
     }
   });
 
+  // NGリスト
   const ngList=document.getElementById('ng-list');
   const ngItems=sorted.filter(hasNG).slice(0,10);
-
   if(ngItems.length===0){
     ngList.innerHTML='<div class="empty"><i class="ti ti-circle-check" style="color:#1D9E75;font-size:20px"></i><br>NG記録はありません</div>';
   } else {
     ngList.innerHTML=ngItems.map(r=>{
       const ngLabelsHit=CHECK_DEFS.filter(d=>r[d.key]==='NG');
-      const notes=ngLabelsHit
-        .map(d=>r[d.note])
-        .filter(v=>v&&v!=='—')
-        .map(v=>'備考：'+v);
-      return '<li class="ng-item"><div class="ng-dot"></div><div><span class="ng-date">'+fmtDate(r['記録日'])+' '+staffSummary(r)+'</span><br>NG項目：'+ngLabelsHit.map(d=>d.label).join('、')+(notes.length?'<br>'+notes.join('<br>'):'')+'</div></li>';
+      const notes=ngLabelsHit.map(d=>r[d.key.replace('結果','備考')]).filter(v=>v&&v!=='—').map(v=>'備考：'+v);
+      return '<li class="ng-item"><div class="ng-dot"></div><div>'+
+        '<span class="ng-date">'+fmtDate(r['記録日'])+' '+mealBadge(r['区分'])+' '+staffSummary(r)+'</span><br>'+
+        'NG項目：'+ngLabelsHit.map(d=>d.label).join('、')+
+        (notes.length?'<br>'+notes.join('<br>'):'')+'</div></li>';
     }).join('');
   }
 
+  // 記録一覧テーブル
   const tbody=document.getElementById('record-tbody');
   if(sorted.length===0){
-    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;color:#888;padding:20px">記録がありません</td></tr>';
+    tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:#888;padding:20px">記録がありません</td></tr>';
   } else {
     tbody.innerHTML=sorted.map(r=>{
       const tempText=[];
       if(r['②冷蔵温度(℃)']&&r['②冷蔵温度(℃)']!=='—') tempText.push('冷蔵'+r['②冷蔵温度(℃)']+'℃');
       if(r['②冷凍温度(℃)']&&r['②冷凍温度(℃)']!=='—') tempText.push('冷凍'+r['②冷凍温度(℃)']+'℃');
-      return '<tr><td>'+fmtDate(r['記録日'])+'</td><td>'+statusBadge(r['ステータス'])+'</td><td>'+(r['食数']||'—')+'</td><td>'+badge(r['①結果'])+'</td><td>'+badge(r['②結果'])+(tempText.length?' '+tempText.join('／'):'')+'</td><td>'+badge(r['③-1結果'])+'</td><td>'+badge(r['③-2結果'])+'</td><td>'+badge(r['③-3結果'])+'</td><td>'+badge(r['④-1結果'])+'</td><td>'+badge(r['④-2結果'])+'</td></tr>';
+      return '<tr>'+
+        '<td>'+fmtDate(r['記録日'])+'</td>'+
+        '<td>'+mealBadge(r['区分'])+'</td>'+
+        '<td>'+statusBadge(r['ステータス'])+'</td>'+
+        '<td>'+(r['食数']||'—')+'</td>'+
+        '<td>'+badge(r['①結果'])+'</td>'+
+        '<td>'+badge(r['②結果'])+(tempText.length?' '+tempText.join('／'):'')+'</td>'+
+        '<td>'+badge(r['③-1結果'])+'</td>'+
+        '<td>'+badge(r['③-2結果'])+'</td>'+
+        '<td>'+badge(r['③-3結果'])+'</td>'+
+        '<td>'+badge(r['④-1結果'])+'</td>'+
+        '<td>'+badge(r['④-2結果'])+'</td>'+
+        '</tr>';
     }).join('');
   }
 }
