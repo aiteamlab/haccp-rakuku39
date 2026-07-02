@@ -44,6 +44,11 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .facility-card{background:#fff;border:1px solid #E0E0D8;border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow .15s}
 .facility-card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.08)}
 .facility-head{display:flex;align-items:center;gap:12px;padding:16px 20px}
+.meal-status-row{display:flex;gap:6px;padding:8px 20px 12px;border-top:1px solid #F0F0E8}
+.meal-chip{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.meal-chip.done{background:#E1F5EE;color:#0F6E56}
+.meal-chip.ng{background:#FCEBEB;color:#A32D2D}
+.meal-chip.missing{background:#F1EFE8;color:#888}
 .status-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
 .status-dot.green{background:#1D9E75}
 .status-dot.amber{background:#F59E0B}
@@ -234,6 +239,14 @@ function renderFacilities(facilities){
     const badgeClass='badge-'+status;
     const lastRecordText=fac.lastRecord?fac.lastRecord:'記録なし';
 
+    const meals=fac.todayMeals||{'朝食':false,'昼食':false,'夕食':false};
+    const mealChips=['朝食','昼食','夕食'].map(mt=>{
+      const done=meals[mt];
+      const cls=done?'done':'missing';
+      const icon=done?'✓':'−';
+      return `<span class="meal-chip ${cls}">${icon} ${mt}</span>`;
+    }).join('');
+
     return `
       <div class="facility-card ${disabledClass}">
         <div class="facility-head">
@@ -249,6 +262,10 @@ function renderFacilities(facilities){
             </div>
             <span class="status-badge ${badgeClass}">${getStatusLabel(status)}</span>
           </div>
+        </div>
+        <div class="meal-status-row">
+          <span style="font-size:11px;color:#888;margin-right:4px;line-height:24px">本日：</span>
+          ${mealChips}
         </div>
       </div>
     `;
