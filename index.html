@@ -151,11 +151,60 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
 .btn-add{padding:7px 14px;background:#1D9E75;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;white-space:nowrap}
 
 @media print {
-  body{background:#fff}
-  #login-screen,.btn-row,.btn-staff-mgr,.dash-link,#print-btn-wrap{display:none!important}
-  .wrap{padding:10mm}
-  .card{break-inside:avoid}
-  .print-footer{display:block!important}
+  @page{size:A4 portrait;margin:8mm 8mm 8mm 8mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{background:#fff;font-size:10px}
+  /* 不要要素を非表示 */
+  #login-screen,.btn-row,.btn-staff-mgr,.dash-link,#print-btn-wrap,
+  .meal-tabs,.meta-row,.prog-row,.summary,
+  #draft-msg,#saved-msg,#error-msg,#incomplete-warn{display:none!important}
+  /* レイアウト調整 */
+  .wrap{padding:0;max-width:100%}
+  .header{border-radius:0;padding:4mm 6mm;margin-bottom:3mm;border:1px solid #ccc}
+  .brand{font-size:8px}
+  .page-title{font-size:13px}
+  /* カードを2列グリッドに */
+  #cards-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2mm}
+  #cards-wrap .card{margin:0;border-radius:4px;break-inside:avoid}
+  .card-head{padding:3px 8px;font-size:9px}
+  .card-no{font-size:8px;padding:1px 5px}
+  .card-title{font-size:9px}
+  .card-icon{font-size:12px}
+  .card-body{padding:4px 8px}
+  /* 担当者・いつ */
+  .staff-row{margin-bottom:4px}
+  .staff-label{font-size:8px}
+  .staff-select{font-size:8px;padding:2px 4px}
+  .when-section{margin-bottom:4px}
+  .when-label{font-size:8px}
+  .when-btn,.when-btn.active{font-size:8px;padding:2px 6px;border-radius:8px}
+  .howto-box{font-size:8px;padding:3px 6px;margin-bottom:4px;line-height:1.4}
+  /* チェックボタン */
+  .check-btns{gap:4px}
+  .check-btn{padding:4px 8px;font-size:9px;border-radius:4px}
+  .check-btn.active-ok{background:#1D9E75!important;color:#fff!important;border-color:#1D9E75!important}
+  .check-btn.active-ng{background:#E24B4A!important;color:#fff!important;border-color:#E24B4A!important}
+  .check-time{font-size:8px}
+  /* NG備考・症状・対応 */
+  .ng-area{font-size:8px;padding:2px 4px;min-height:16px}
+  .ng-label{font-size:8px}
+  .ng-label.visible{display:block!important}
+  .ng-area[style*="block"]{display:block!important}
+  /* 対応確認者 */
+  .verify-area.visible{display:block!important;padding:4px 6px;margin-top:3px}
+  .verify-label{font-size:8px}
+  .verify-select{font-size:8px;padding:2px 4px}
+  .verify-time{font-size:8px}
+  /* 冷蔵・冷凍 */
+  .fridge-row{gap:4px;margin-bottom:4px}
+  .fridge-chk{font-size:8px;padding:2px 6px}
+  .temp-input-row{gap:4px}
+  .t-input{width:45px;font-size:10px;padding:2px 4px}
+  .t-badge{font-size:8px;padding:1px 4px}
+  /* フッター */
+  .print-footer{display:block!important;font-size:8px;margin-top:3mm;border-top:1px solid #ccc;padding-top:2mm}
+  /* 区分表示用 */
+  .meal-tab{display:none}
 }
 @media(max-width:640px){
   .summary{grid-template-columns:repeat(2,1fr)}
@@ -224,6 +273,7 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
   </div>
 
   <!-- ① 原材料の受入確認 -->
+  <div id="cards-wrap">
   <div class="card">
     <div class="card-head">
       <span class="card-no">①</span>
@@ -534,6 +584,8 @@ body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px;backgr
       </div>
     </div>
   </div>
+
+  </div><!-- /cards-wrap -->
 
   <div class="incomplete-warn" id="incomplete-warn"></div>
   <div class="btn-row">
