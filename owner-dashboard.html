@@ -193,6 +193,7 @@ async function loadData(){
 function getStatus(fac){
   if(fac.status!=='有効') return 'gray';
   if(!fac.lastRecord) return 'red';
+  if(fac.todayNG) return 'red'; // 当日NGがあれば要確認
   const last=new Date(fac.lastRecord+'T00:00:00');
   const now=new Date();
   now.setHours(0,0,0,0);
