@@ -248,7 +248,7 @@ function renderFacilities(facilities){
     }).join('');
 
     return `
-      <div class="facility-card ${disabledClass}">
+      <div class="facility-card ${disabledClass}" onclick="goToDashboard('${fac.facilityName}')">
         <div class="facility-head">
           <div class="status-dot ${status}"></div>
           <div class="facility-info">
@@ -275,6 +275,10 @@ function renderFacilities(facilities){
   document.getElementById('s-green').textContent=greenCount;
   document.getElementById('s-amber').textContent=amberCount;
   document.getElementById('s-red').textContent=redCount;
+}
+
+function goToDashboard(facilityName){
+  window.location.href='dashboard.html?facility='+encodeURIComponent(facilityName);
 }
 
 checkSession();
