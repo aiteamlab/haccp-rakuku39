@@ -1158,7 +1158,7 @@ function ensureStaffOption(selectEl,name){
   const exists=[...selectEl.options].some(o=>o.value===name);
   if(!exists){
     const opt=document.createElement('option');
-    opt.value=name;opt.textContent=name+'（計画外）';
+    opt.value=name;opt.textContent=name;
     selectEl.appendChild(opt);
   }
 }
